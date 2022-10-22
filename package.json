@@ -1,0 +1,29 @@
+{
+  "name": "dona-server",
+  "version": "1.0.0",
+  "description": "server for dona web and mobile",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "wawiny edwin",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^4.5.0",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.1",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.6.5",
+    "nodemailer": "^6.8.0",
+    "nodemon": "^2.0.20",
+    "otp-generator": "^4.0.0",
+    "pg": "^8.8.0",
+    "swagger-ui-express": "^4.5.0"
+  },
+  "devDependencies": {
+    "prisma": "^4.5.0"
+  }
+}
