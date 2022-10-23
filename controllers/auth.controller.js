@@ -10,11 +10,20 @@ const checkMail = async (email) => {
       email: email,
     },
   });
+
+  if (!user) {
+    return false;
+  }
   return user;
 };
 
 const validateOTP = async (email, otp) => {
-  const user = checkMail(email);
+  const user = await prisma.user.findUnique({
+    where: {
+      email: email,
+    },
+  });
+  console.log(otp);
   if (!user) {
     return [false, "user doesn't exist"];
   }
@@ -32,129 +41,161 @@ const validateOTP = async (email, otp) => {
   return [true, newUser];
 };
 
+const generatePassword = (password) => {
+  encrypted = bcrypt.hashSync(password, 10);
+  return encrypted;
+};
+
 // user signup
 exports.signup = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, name, phone } = req.body;
   const otp = generateOTP();
-  const user = checkMail(email);
-  if (user) {
+  const exists = checkMail(email);
+  if (exists) {
     res.send("user with this email exists");
-  } else {
-    encrypted = bcrypt.hash(password, 12);
-    const user = new prisma.user.create({
-      data: {
-        email: email.toLowerCase(),
-        password: encrypted,
-        otp: otp,
-      },
-    });
-    try {
-      await sendMail({
-        to: email,
-        otp: otp,
-      });
-    } catch (error) {
-      return [false, "unable to signup, please try again later", error];
-    }
-    return jwtSign(user);
   }
+
+  encrypted = generatePassword(password);
+  const user = await prisma.user.create({
+    data: {
+      email: email.toLowerCase(),
+      name: name,
+      phone: phone,
+      password: encrypted,
+      otp: otp,
+    },
+  });
+  try {
+    await sendMail({
+      to: email,
+      otp: otp,
+    });
+    res.status(200).send({
+      message: "account creation success",
+    });
+  } catch (error) {
+    return [false, "unable to signup, please try again later", error];
+  }
+  return jwtSign(user);
 };
 
 // facility registration
 exports.register = async (req, res) => {
   const { email, password } = req.body;
   const otp = generateOTP();
-  const user = checkMail(email);
-  if (!user) {
+  const exists = checkMail(email);
+  if (exists) {
     res.send("user with this email exists");
-  } else {
-    encrypted = bcrypt.hash(password, 12);
-    const user = new prisma.user.create({
-      data: {
-        email: email.toLowerCase(),
-        password: encrypted,
-        role: "FACILITYADMIN",
-        otp: otp,
-      },
-    });
-    try {
-      await sendMail({
-        to: email,
-        otp: otp,
-      });
-    } catch (error) {
-      return [false, "unable to signup, please try again later", error];
-    }
-    return jwtSign(user);
   }
+  encrypted = generatePassword(password);
+  const user = new prisma.user.create({
+    data: {
+      email: email.toLowerCase(),
+      password: encrypted,
+      role: "FACILITYADMIN",
+      otp: otp,
+    },
+  });
+  try {
+    await sendMail({
+      to: email,
+      otp: otp,
+    });
+  } catch (error) {
+    return [false, "unable to signup, please try again later", error];
+  }
+  return jwtSign(user);
 };
 
 // user creation with role in facility
 exports.createUser = async (req, res) => {
   const { email, password, facility } = req.body;
-  const user = await checkMail(email);
-  if (!user) {
+  const otp = generateOTP();
+  const exists = checkMail(email);
+  if (exists) {
     res.send("user with this email exists");
-  } else {
-    encrypted = bcrypt.hash(password, 12);
-    const user = new prisma.user.create({
-      data: {
-        email: email.toLowerCase(),
-        password: encrypted,
-        role: "FACILITYUSER",
-        facility: facility,
-      },
-    });
-    return jwtSign(user);
   }
+  encrypted = generatePassword(password);
+  const user = new prisma.user.create({
+    data: {
+      email: email.toLowerCase(),
+      password: encrypted,
+      role: "FACILITYUSER",
+      otp: otp,
+    },
+  });
+
+  try {
+    await sendMail({
+      to: email,
+      otp: otp,
+    });
+  } catch (error) {
+    return [false, "unable to create account, please try again later", error];
+  }
+  res.status(200).send({
+    message: "user account creation success",
+  });
 };
 
-// email verification
+// email verification works
 exports.verifyMail = async (req, res) => {
   const { email, otp } = req.body;
   const user = await validateOTP(email, otp);
-  res.send(user);
+  res.status(200).send({
+    message: "user verification success",
+    user: user,
+  });
 };
 
-// user login
+// user login works
 exports.login = async (req, res) => {
   const { email, password } = req.body;
-  const user = checkMail(email);
+  const user = await prisma.user.findUnique({
+    where: {
+      email: email,
+    },
+  });
   if (!user) {
     res.json({
       message: "user with this email doesn't exist",
     });
-  } else {
-    if (user && bcrypt.compareSync(password, user.password)) {
-      return jwtSign(user);
-    }
+  }
+  if (user && bcrypt.compareSync(password, user.password)) {
+    const token = jwtSign(user);
+    res.send({
+      token: token,
+      role: user.role,
+      message: "authentication success",
+    });
   }
 };
 
 // password change
 exports.updatePassword = async (req, res) => {
   const { email, password, newPassword } = req.body;
-  const user = checkMail(email);
+  const user = await prisma.user.findUnique({
+    where: {
+      email: email,
+    },
+  });
   if (!user) {
     res.send("email address not valid");
+  }
+  if (user && bcrypt.compareSync(password, user.password)) {
+    encrypted = generatePassword(password);
+    const user = new prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        password: encrypted,
+      },
+    });
   } else {
-    if (user && bcrypt.compareSync(password, user.password)) {
-      encrypted = bcrypt.hash(password, 12);
-      const user = new prisma.user.update({
-        where: {
-          email: email,
-        },
-        data: {
-          email: email.toLowerCase(),
-          password: encrypted,
-          facility: facility,
-        },
-      });
-    } else {
-      res.status(400).send({
-        message: "password provided is invalid",
-      });
-    }
+    res.status(400).send({
+      message: "password provided is invalid",
+    });
   }
 };
 

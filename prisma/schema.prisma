@@ -38,8 +38,6 @@ model User {
   role    Role     @default(USER)
   profile UserProfile?
   address Address?
-  facility Facility @relation(fields: [facilityId], references: [id])
-  facilityId Int @unique @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -52,7 +50,6 @@ model Facility {
   description   String?
   address   FacilityAddress?
   profile   FacilityProfile?
-  users User[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
