@@ -3,7 +3,10 @@ const bcrypt = require("bcryptjs");
 const { jwtSign } = require("../middlewares/auth.middleware");
 const { generateOTP } = require("../services/otp.services");
 const { sendMail } = require("../services/email.service");
+const { sendMessage } = require("../services/message.service");
+const axios = require("axios");
 
+// check email exists
 const checkMail = async (email) => {
   const user = await prisma.user.findUnique({
     where: {
@@ -17,6 +20,22 @@ const checkMail = async (email) => {
   return user;
 };
 
+// check phone exists
+const checkPhone = async (phone) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      phone: phone,
+    },
+  });
+
+  console.log(user);
+
+  if (!user) {
+    return false;
+  }
+  return user;
+};
+// validate otp
 const validateOTP = async (email, otp) => {
   const user = await prisma.user.findUnique({
     where: {
@@ -46,37 +65,69 @@ const generatePassword = (password) => {
   return encrypted;
 };
 
-// user signup
+// user signup by mobile number
+exports.mobileSignup = async (req, res) => {
+  const { password, phone } = req.body;
+  const otp = generateOTP();
+  const exists = checkPhone(phone);
+
+  if (exists) {
+    res.send("user with this phone exists");
+  } else {
+    encrypted = generatePassword(password);
+    const user = await prisma.user.create({
+      data: {
+        phone: phone,
+        password: encrypted,
+        otp: otp,
+      },
+    });
+    try {
+      await sendMessage({
+        to: phone,
+        message: `enter this code to verify your account ${otp}. Thank you`,
+      });
+      res.status(200).send({
+        message: "account creation success",
+      });
+    } catch (error) {
+      return [false, "unable to signup, please try again later", error];
+    }
+    return jwtSign(user);
+  }
+};
+
+// user signup by email
 exports.signup = async (req, res) => {
   const { email, password, name, phone } = req.body;
   const otp = generateOTP();
   const exists = checkMail(email);
   if (exists) {
     res.send("user with this email exists");
-  }
-
-  encrypted = generatePassword(password);
-  const user = await prisma.user.create({
-    data: {
-      email: email.toLowerCase(),
-      name: name,
-      phone: phone,
-      password: encrypted,
-      otp: otp,
-    },
-  });
-  try {
-    await sendMail({
-      to: email,
-      otp: otp,
+  } else {
+    encrypted = generatePassword(password);
+    const user = await prisma.user.create({
+      data: {
+        email: email.toLowerCase(),
+        name: name,
+        phone: phone,
+        password: encrypted,
+        otp: otp,
+      },
     });
-    res.status(200).send({
-      message: "account creation success",
-    });
-  } catch (error) {
-    return [false, "unable to signup, please try again later", error];
+    try {
+      await sendMail({
+        to: email,
+        otp: otp,
+      });
+      res.status(200).send({
+        message: "account creation success",
+      });
+    } catch (error) {
+      return [false, "unable to signup, please try again later", error];
+    }
+    return jwtSign(user);
   }
-  return jwtSign(user);
 };
 
 // facility registration
@@ -86,25 +137,26 @@ exports.register = async (req, res) => {
   const exists = checkMail(email);
   if (exists) {
     res.send("user with this email exists");
-  }
-  encrypted = generatePassword(password);
-  const user = new prisma.user.create({
-    data: {
-      email: email.toLowerCase(),
-      password: encrypted,
-      role: "FACILITYADMIN",
-      otp: otp,
-    },
-  });
-  try {
-    await sendMail({
-      to: email,
-      otp: otp,
+  } else {
+    encrypted = generatePassword(password);
+    const user = new prisma.user.create({
+      data: {
+        email: email.toLowerCase(),
+        password: encrypted,
+        role: "FACILITYADMIN",
+        otp: otp,
+      },
     });
-  } catch (error) {
-    return [false, "unable to signup, please try again later", error];
+    try {
+      await sendMail({
+        to: email,
+        otp: otp,
+      });
+    } catch (error) {
+      return [false, "unable to signup, please try again later", error];
+    }
+    return jwtSign(user);
   }
-  return jwtSign(user);
 };
 
 // user creation with role in facility
@@ -114,28 +166,30 @@ exports.createUser = async (req, res) => {
   const exists = checkMail(email);
   if (exists) {
     res.send("user with this email exists");
-  }
-  encrypted = generatePassword(password);
-  const user = new prisma.user.create({
-    data: {
-      email: email.toLowerCase(),
-      password: encrypted,
-      role: "FACILITYUSER",
-      otp: otp,
-    },
-  });
-
-  try {
-    await sendMail({
-      to: email,
-      otp: otp,
+  } else {
+    encrypted = generatePassword(password);
+    const user = new prisma.user.create({
+      data: {
+        email: email.toLowerCase(),
+        password: encrypted,
+        role: "FACILITYUSER",
+        otp: otp,
+      },
     });
-  } catch (error) {
-    return [false, "unable to create account, please try again later", error];
+
+    try {
+      await sendMail({
+        to: email,
+        otp: otp,
+      });
+    } catch (error) {
+      return [false, "unable to create account, please try again later", error];
+    }
+    res.status(200).send({
+      message: "user account creation success",
+      user: user,
+    });
   }
-  res.status(200).send({
-    message: "user account creation success",
-  });
 };
 
 // email verification works

@@ -29,10 +29,9 @@ enum BloodType {
 
 model User {
   id      Int      @id @default(autoincrement())
-  email   String   @unique
+  email   String?   @unique
   password String
-  name    String
-  phone String
+  phone String?  @unique
   otp String
   verified Boolean @default(false)
   role    Role     @default(USER)
@@ -93,6 +92,7 @@ model UserProfile {
   id     Int     @id @default(autoincrement())
   user   User    @relation(fields: [userId], references: [id])
   userId Int     @unique
+  name    String
   dateOfBirth String
   bloodType BloodType
   donations Donation[]
