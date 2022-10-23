@@ -13,9 +13,14 @@ app.use(
   })
 );
 
-const authRouter = require("./routes/auth.routes");
-const userRouter = require("./routes/users.routes");
+const authRouter = require("./routes/auth.route");
+const profileRouter = require("./routes/profile.route");
+const donationRouter = require("./routes/donation.route");
+const addressRouter = require("./routes/address.route");
 app.use("/auth", authRouter);
+app.use("/profile", profileRouter);
+app.use("/donation", donationRouter);
+app.use("/address", addressRouter);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.get("", (req, res) => {

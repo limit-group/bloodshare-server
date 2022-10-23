@@ -17,6 +17,16 @@ enum Role {
   SUPERADMIN
 }
 
+enum BloodType {
+  A_POSITIVE
+  A_NEGATIVE
+  B_POSITIVE
+  AB_NEGATIVE
+  AB_POSITIVE
+  O_POSITIVE
+  O_NEGATIVE
+}
+
 model User {
   id      Int      @id @default(autoincrement())
   email   String   @unique
@@ -75,6 +85,8 @@ model FacilityProfile {
   facility Facility @relation(fields: [facilityId], references: [id])
   facilityId Int @unique
   donation Donation[]
+  donationBroadcasts DonationBroadCast[]
+  emergencydonationBroadcasts EmergencyDonationBroadCast[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -85,7 +97,7 @@ model UserProfile {
   user   User    @relation(fields: [userId], references: [id])
   userId Int     @unique
   dateOfBirth String
-  bloodType String
+  bloodType BloodType
   donations Donation[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -98,6 +110,27 @@ model Donation {
   profileId Int     @unique
   facility FacilityProfile @relation(fields: [facilityId], references: [id])
   facilityId Int @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DonationBroadCast {
+  id     Int     @id @default(autoincrement())
+  when   DateTime
+  venue  String
+  description  String @db.VarChar(255)
+  facility FacilityProfile @relation(fields: [facilityProfileId], references: [id])
+  facilityProfileId Int @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EmergencyDonationBroadCast {
+  id     Int     @id @default(autoincrement())
+  facility FacilityProfile @relation(fields: [facilityProfileId], references: [id])
+  facilityProfileId Int @unique
+  description String @db.VarChar(255)
+  bloodType BloodType
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

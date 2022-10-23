@@ -1,3 +1,33 @@
 {
-    
+  "info": {
+    "title": "Dona API",
+    "version": "1.0.0",
+    "description": "API for Dona Web and Client"
+  },
+  "host": "localhost:5000",
+  "basePath": "/",
+  "swagger": "2.0",
+  "paths": {
+    "/": {
+      "parameters": [],
+      "get": {
+        "operationId": "anotherRoute",
+        "summary": "another route",
+        "description": "another route",
+        "produces": ["application/json"],
+        "responses": {
+          "202": {
+            "description": "202 response",
+            "examples": {
+              "application/json": "{ foo: 'bar' }"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {},
+  "responses": {},
+  "parameters": {},
+  "securityDefinitions": {}
 }
