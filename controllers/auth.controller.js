@@ -1,10 +1,9 @@
 const prisma = require("../utils/db.utils");
 const bcrypt = require("bcryptjs");
 const { jwtSign } = require("../middlewares/auth.middleware");
-const { generateOTP } = require("../services/otp.services");
+const { generateOTP } = require("../services/otp.service");
 const { sendMail } = require("../services/email.service");
 const { sendMessage } = require("../services/message.service");
-const axios = require("axios");
 
 // check email exists
 const checkMail = async (email) => {
@@ -13,7 +12,6 @@ const checkMail = async (email) => {
       email: email,
     },
   });
-
   if (!user) {
     return false;
   }
@@ -71,7 +69,7 @@ exports.mobileSignup = async (req, res) => {
   const otp = generateOTP();
   const exists = checkPhone(phone);
 
-  if (exists) {
+  if (!exists) {
     res.send("user with this phone exists");
   } else {
     encrypted = generatePassword(password);

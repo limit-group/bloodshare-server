@@ -6,14 +6,27 @@ const {
   addFacilityProfile,
   updateUserProfile,
   updateFacilityProfile,
+  deleteFacilityProfile,
+  deleteUserProfile,
 } = require("../controllers/profile.controller");
+const { isAuth } = require("../middlewares/auth.middleware");
 const router = express.Router();
 
-router.get("/facility-profile", getFacilityProfile);
-router.get("/user-profile", getUserProfile);
-router.post("/create-user-profile", addUserProfile);
-router.post("/create-facility-profile", addFacilityProfile);
-router.post("/update-user-profile", updateUserProfile);
-router.post("/update-facility-profile", updateFacilityProfile);
+router.get("/user-profile/", isAuth, getUserProfile);
+router.post("/create-user-profile", isAuth, addUserProfile);
+router.post("/update-user-profile", isAuth, updateUserProfile);
+router.delete("/delete-user-profile", isAuth, deleteUserProfile);
+router.post("/create-facility-profile", isAuth, addFacilityProfile);
+router.get("/facility-profile/:facilityId", isAuth, getFacilityProfile);
+router.post(
+  "/update-facility-profile/:facilityId",
+  isAuth,
+  updateFacilityProfile
+);
+router.delete(
+  "/delete-facility-profile/:facilityId",
+  isAuth,
+  deleteFacilityProfile
+);
 
 module.exports = router;

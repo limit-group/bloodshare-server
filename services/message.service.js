@@ -3,7 +3,7 @@ const credentials = {
   username: process.env.AT_NAME, // use 'sandbox' for development in the test environment
 };
 
-const Africastalking = require("africastalking");
+const Africastalking = require("africastalking")(credentials);
 
 const sms = Africastalking.SMS;
 
