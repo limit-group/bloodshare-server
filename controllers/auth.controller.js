@@ -83,7 +83,7 @@ exports.mobileSignup = async (req, res) => {
     try {
       await sendMessage({
         to: phone,
-        message: `enter this code to verify your account ${otp}. Thank you`,
+        message: `enter this code  ${otp} to verify your account . Thank you`,
       });
       res.status(200).send({
         message: "account creation success",
@@ -211,6 +211,29 @@ exports.login = async (req, res) => {
   if (!user) {
     res.json({
       message: "user with this email doesn't exist",
+    });
+  }
+  if (user && bcrypt.compareSync(password, user.password)) {
+    const token = jwtSign(user);
+    res.send({
+      token: token,
+      role: user.role,
+      message: "authentication success",
+    });
+  }
+};
+
+// user login works
+exports.mobileLogin = async (req, res) => {
+  const { phone, password } = req.body;
+  const user = await prisma.user.findUnique({
+    where: {
+      phone: phone,
+    },
+  });
+  if (!user) {
+    res.json({
+      message: "user with this phone number doesn't exist",
     });
   }
   if (user && bcrypt.compareSync(password, user.password)) {

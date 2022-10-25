@@ -1,18 +1,23 @@
-const credentials = {
-  apiKey: process.env.AT_KEY, // use your sandbox app API key for development in the test environment
-  username: process.env.AT_NAME, // use 'sandbox' for development in the test environment
-};
+const AfricasTalking = require('africastalking');
 
-const Africastalking = require("africastalking")(credentials);
+const africastalking = AfricasTalking({
+  apiKey: process.env.AT_KEY,
+  username: process.env.AT_NAME,
+});
 
-const sms = Africastalking.SMS;
-
+// TODO: Complete the AT messaging Service
 module.exports.sendSMS = async (params) => {
   try {
-    let info = await sms.send({
+    let info = await africastalking.SMS.send({
       to: params.to,
       message: params.message,
-    });
+    })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
     return info;
   } catch (err) {
     console.log(err);

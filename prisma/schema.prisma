@@ -28,106 +28,107 @@ enum BloodType {
 }
 
 model User {
-  id      Int      @id @default(autoincrement())
-  email   String?   @unique
-  password String
-  phone String?  @unique
-  otp String
-  verified Boolean @default(false)
-  role    Role     @default(USER)
-  profile UserProfile?
-  address Address?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        Int          @id @default(autoincrement())
+  email     String?      @unique
+  password  String
+  phone     String?      @unique
+  otp       String
+  verified  Boolean      @default(false)
+  role      Role         @default(USER)
+  profile   UserProfile?
+  address   Address?
+  donations Donation[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 }
 
-
-
 model Facility {
-  id        Int      @id @default(autoincrement())
-  name     String   @db.VarChar(255)
-  description   String?
-  address   FacilityAddress?
-  profile   FacilityProfile?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                          Int                          @id @default(autoincrement())
+  name                        String                       @db.VarChar(255)
+  description                 String?
+  address                     FacilityAddress?
+  profile                     FacilityProfile?
+  donation                    Donation[]
+  donationBroadcasts          DonationBroadCast[]
+  emergencydonationBroadcasts EmergencyDonationBroadCast[]
+  createdAt                   DateTime                     @default(now())
+  updatedAt                   DateTime                     @updatedAt
 }
 
 model FacilityAddress {
-  id    Int @id @default(autoincrement())
-  facility Facility @relation(fields: [facilityId], references: [id])
-  facilityId Int @unique
-  street String
+  id           Int      @id @default(autoincrement())
+  facility     Facility @relation(fields: [facilityId], references: [id])
+  facilityId   Int      @unique
+  street       String
   streetNumber String
-  city String
-  country String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  city         String
+  country      String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
-
 model Address {
-  id    Int @id @default(autoincrement())
-  user   User    @relation(fields: [userId], references: [id])
-  userId Int @unique
-  streetName String
+  id           Int    @id @default(autoincrement())
+  user         User   @relation(fields: [userId], references: [id])
+  userId       Int    @unique
+  streetName   String
   streetNumber String
-  city String
-  country String
+  city         String
+  country      String
 }
 
 model FacilityProfile {
-  id    Int @id @default(autoincrement())
-  facility Facility @relation(fields: [facilityId], references: [id])
-  facilityId Int @unique
-  donation Donation[]
-  donationBroadcasts DonationBroadCast[]
-  emergencydonationBroadcasts EmergencyDonationBroadCast[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                         Int                         @id @default(autoincrement())
+  facility                   Facility                    @relation(fields: [facilityId], references: [id])
+  facilityId                 Int                         @unique
+  createdAt                  DateTime                    @default(now())
+  updatedAt                  DateTime                    @updatedAt
+  DonationBroadCast          DonationBroadCast?
+  EmergencyDonationBroadCast EmergencyDonationBroadCast?
 }
-
 
 model UserProfile {
-  id     Int     @id @default(autoincrement())
-  user   User    @relation(fields: [userId], references: [id])
-  userId Int     @unique
-  name    String
+  id          Int       @id @default(autoincrement())
+  user        User      @relation(fields: [userId], references: [id])
+  userId      Int       @unique
+  name        String
   dateOfBirth String
-  bloodType BloodType
-  donations Donation[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  bloodType   BloodType
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
-
 model Donation {
-  id     Int     @id @default(autoincrement())
-  profile   UserProfile   @relation(fields: [profileId], references: [id])
-  profileId Int     @unique
-  facility FacilityProfile @relation(fields: [facilityId], references: [id])
-  facilityId Int @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         Int      @id @default(autoincrement())
+  donor      User     @relation(fields: [donorId], references: [id])
+  donorId    Int      @unique
+  facility   Facility @relation(fields: [facilityId], references: [id])
+  facilityId Int      @unique
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model DonationBroadCast {
-  id     Int     @id @default(autoincrement())
-  when   DateTime
-  venue  String
-  description  String @db.VarChar(255)
-  facility FacilityProfile @relation(fields: [facilityProfileId], references: [id])
-  facilityProfileId Int @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                Int             @id @default(autoincrement())
+  when              DateTime
+  venue             String
+  description       String          @db.VarChar(255)
+  facility          FacilityProfile @relation(fields: [facilityProfileId], references: [id])
+  facilityProfileId Int             @unique
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  Facility          Facility?       @relation(fields: [facilityId], references: [id])
+  facilityId        Int?
 }
 
 model EmergencyDonationBroadCast {
-  id     Int     @id @default(autoincrement())
-  facility FacilityProfile @relation(fields: [facilityProfileId], references: [id])
-  facilityProfileId Int @unique
-  description String @db.VarChar(255)
-  bloodType BloodType
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                Int             @id @default(autoincrement())
+  facility          FacilityProfile @relation(fields: [facilityProfileId], references: [id])
+  facilityProfileId Int             @unique
+  description       String          @db.VarChar(255)
+  bloodType         BloodType
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  Facility          Facility?       @relation(fields: [facilityId], references: [id])
+  facilityId        Int?
 }

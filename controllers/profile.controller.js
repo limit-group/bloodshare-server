@@ -1,7 +1,6 @@
 const prisma = require("../utils/db.utils");
 
 // facility profile...
-
 exports.getFacilityProfile = async (req, res) => {
   const profile = await prisma.facilityProfile.findFirst({
     where: {
@@ -32,7 +31,7 @@ exports.addFacilityProfile = async (req, res) => {
       {
         message: "profile created",
       },
-      error
+      profile
     );
   } catch (error) {
     console.log(error);
@@ -77,10 +76,9 @@ exports.deleteFacilityProfile = async (req, res) => {
   }
 };
 
-// user profile
+// user profile-works
 exports.getUserProfile = async (req, res) => {
   const user = req.user;
-
   const profile = await prisma.userProfile.findUnique({
     where: {
       userId: user.id,
@@ -98,54 +96,54 @@ exports.getUserProfile = async (req, res) => {
   }
 };
 
+// works
 exports.addUserProfile = async (req, res) => {
   const user = req.user;
-  const { name, description } = req.body;
+  const { name, dateOfBirth, bloodType } = req.body;
   try {
     const profile = await prisma.userProfile.create({
       data: {
         userId: user.id,
         name: name,
-        description: description,
+        dateOfBirth: dateOfBirth,
+        bloodType: bloodType,
       },
     });
     console.log(profile);
-    res.status(200).send(
-      {
-        message: "profile created",
-      },
-      error
-    );
+    res.status(201).send({
+      message: "profile created",
+      profile: profile,
+    });
   } catch (error) {
     console.log(error);
   }
 };
 
+// works
 exports.updateUserProfile = async (req, res) => {
   const user = req.user;
-  const { name, description } = req.body;
+  const { name, dateOfBirth, bloodType } = req.body;
   try {
-    const profile = await prisma.userProfile.create({
+    const profile = await prisma.userProfile.update({
       where: {
         userId: user.id,
       },
       data: {
         name: name,
-        description: description,
+        dateOfBirth: dateOfBirth,
+        bloodType: bloodType,
       },
     });
-    res.status(200).send(
-      {
-        message: "profile created",
-        profile: profile,
-      },
-      error
-    );
+    res.status(200).send({
+      message: "profile updated",
+      profile: profile,
+    });
   } catch (error) {
     console.log(error);
   }
 };
 
+// untested
 exports.deleteUserProfile = async (req, res) => {
   const user = req.user;
   try {

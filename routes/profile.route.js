@@ -12,7 +12,7 @@ const {
 const { isAuth } = require("../middlewares/auth.middleware");
 const router = express.Router();
 
-router.get("/user-profile/", isAuth, getUserProfile);
+router.get("/user-profile", isAuth, getUserProfile);
 router.post("/create-user-profile", isAuth, addUserProfile);
 router.post("/update-user-profile", isAuth, updateUserProfile);
 router.delete("/delete-user-profile", isAuth, deleteUserProfile);

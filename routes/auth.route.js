@@ -8,11 +8,13 @@ const {
   updatePassword,
   createUser,
   mobileSignup,
+  mobileLogin,
 } = require("../controllers/auth.controller");
 const router = express.Router();
 
 router.get("", endpoint);
 router.post("/login", login);
+router.post("/m-login", mobileLogin);
 router.post("/signup", signup);
 router.post("/m-signup", mobileSignup)
 router.post("/register", register);
