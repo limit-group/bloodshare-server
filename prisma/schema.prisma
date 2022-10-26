@@ -36,7 +36,6 @@ model User {
   verified  Boolean      @default(false)
   role      Role         @default(USER)
   profile   UserProfile?
-  address   Address?
   donations Donation[]
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
@@ -45,9 +44,14 @@ model User {
 model Facility {
   id                          Int                          @id @default(autoincrement())
   name                        String                       @db.VarChar(255)
-  description                 String?
-  address                     FacilityAddress?
-  profile                     FacilityProfile?
+  verified                    Boolean                      @default(false)
+  mission                     String
+  streetName                  String
+  streetNumber                String
+  city                        String
+  country                     String
+  license                     String?
+  licenseNumber               String                       @unique
   donation                    Donation[]
   donationBroadcasts          DonationBroadCast[]
   emergencydonationBroadcasts EmergencyDonationBroadCast[]
@@ -55,47 +59,19 @@ model Facility {
   updatedAt                   DateTime                     @updatedAt
 }
 
-model FacilityAddress {
-  id           Int      @id @default(autoincrement())
-  facility     Facility @relation(fields: [facilityId], references: [id])
-  facilityId   Int      @unique
-  street       String
-  streetNumber String
-  city         String
-  country      String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-}
-
-model Address {
-  id           Int    @id @default(autoincrement())
-  user         User   @relation(fields: [userId], references: [id])
-  userId       Int    @unique
-  streetName   String
-  streetNumber String
-  city         String
-  country      String
-}
-
-model FacilityProfile {
-  id                         Int                         @id @default(autoincrement())
-  facility                   Facility                    @relation(fields: [facilityId], references: [id])
-  facilityId                 Int                         @unique
-  createdAt                  DateTime                    @default(now())
-  updatedAt                  DateTime                    @updatedAt
-  DonationBroadCast          DonationBroadCast?
-  EmergencyDonationBroadCast EmergencyDonationBroadCast?
-}
-
 model UserProfile {
-  id          Int       @id @default(autoincrement())
-  user        User      @relation(fields: [userId], references: [id])
-  userId      Int       @unique
-  name        String
-  dateOfBirth String
-  bloodType   BloodType
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id           Int       @id @default(autoincrement())
+  user         User      @relation(fields: [userId], references: [id])
+  userId       Int       @unique
+  name         String
+  dateOfBirth  String
+  bloodType    BloodType
+  streetName   String?
+  streetNumber String?
+  city         String?
+  country      String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }
 
 model Donation {
@@ -109,26 +85,22 @@ model Donation {
 }
 
 model DonationBroadCast {
-  id                Int             @id @default(autoincrement())
-  when              DateTime
-  venue             String
-  description       String          @db.VarChar(255)
-  facility          FacilityProfile @relation(fields: [facilityProfileId], references: [id])
-  facilityProfileId Int             @unique
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-  Facility          Facility?       @relation(fields: [facilityId], references: [id])
-  facilityId        Int?
+  id          Int      @id @default(autoincrement())
+  Facility    Facility @relation(fields: [facilityId], references: [id])
+  facilityId  Int
+  when        DateTime
+  venue       String
+  description String   @db.VarChar(255)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model EmergencyDonationBroadCast {
-  id                Int             @id @default(autoincrement())
-  facility          FacilityProfile @relation(fields: [facilityProfileId], references: [id])
-  facilityProfileId Int             @unique
-  description       String          @db.VarChar(255)
-  bloodType         BloodType
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-  Facility          Facility?       @relation(fields: [facilityId], references: [id])
-  facilityId        Int?
+  id          Int       @id @default(autoincrement())
+  Facility    Facility  @relation(fields: [facilityId], references: [id])
+  facilityId  Int
+  description String    @db.VarChar(255)
+  bloodType   BloodType
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
