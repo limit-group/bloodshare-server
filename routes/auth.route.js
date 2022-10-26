@@ -14,13 +14,13 @@ const router = express.Router();
 
 router.get("", endpoint);
 router.post("/login", login);
-router.post("/m-login", mobileLogin);
+router.post("/mobileLogin", mobileLogin);
 router.post("/signup", signup);
-router.post("/m-signup", mobileSignup)
+router.post("/mobileSignup", mobileSignup)
 router.post("/register", register);
 router.post("/verify", verifyMail);
-router.post("/update-password", updatePassword)
-router.post("/create-user", createUser)
+router.post("/updatePassword", updatePassword)
+router.post("/create", createUser)
 
 
 module.exports = router;

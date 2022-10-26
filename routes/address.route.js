@@ -10,11 +10,11 @@ const {
 const { isAuth } = require("../middlewares/auth.middleware");
 const router = express.Router();
 
-router.get("/facility-address", isAuth, getFacilityAddress);
-router.get("/user-address", isAuth, getUserAddress);
-router.post("/create-user-address", isAuth, addUserAddress);
-router.post("/create-facility-address", isAuth, addFacilityAddress);
-router.post("/update-user-address", isAuth, updateUserAddress);
-router.post("update-facility-address", isAuth, updateFacilityAddress);
+router.get("/facility", isAuth, getFacilityAddress);
+router.get("/user", isAuth, getUserAddress);
+router.post("/user", isAuth, addUserAddress);
+router.post("/facility", isAuth, addFacilityAddress);
+router.post("/updateUser", isAuth, updateUserAddress);
+router.post("updateFacility/:facilityId", isAuth, updateFacilityAddress);
 
 module.exports = router;
