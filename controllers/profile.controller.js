@@ -51,6 +51,10 @@ exports.updateUserProfile = async (req, res) => {
       name: name,
       dateOfBirth: dateOfBirth,
       bloodType: bloodType,
+      streetName: streetName,
+      streetNumber: streetNumber,
+      city: city,
+      country: country,
     },
   });
   if (!profile) {
