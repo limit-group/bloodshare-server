@@ -18,7 +18,6 @@ const uploadImage = async (imagePath) => {
     unique_filename: false,
     overwrite: true,
   };
-
   try {
     // Upload the image
     const result = await cloudinary.uploader.upload(imagePath, options);

@@ -8,7 +8,6 @@ const MAIL_SETTINGS = {
 
 const nodemailer = require("nodemailer");
 const transporter = nodemailer.createTransport(MAIL_SETTINGS);
-
 module.exports.sendMail = async (params) => {
   try {
     let info = await transporter.sendMail({

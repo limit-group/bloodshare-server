@@ -64,6 +64,7 @@ model UserProfile {
   user         User      @relation(fields: [userId], references: [id])
   userId       Int       @unique
   name         String
+  avatar      String?
   dateOfBirth  String
   bloodType    BloodType
   streetName   String?

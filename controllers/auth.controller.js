@@ -239,6 +239,23 @@ exports.verifyMail = async (req, res) => {
   }
 };
 
+// phone number verification
+exports.verifyPhone = async (req, res) => {
+  const { phone, otp } = req.body;
+  try {
+    const user = await validateOTP(email, otp);
+    res.status(200).send({
+      message: "user verification success",
+      user: user,
+    });
+  } catch (error) {
+    res.status(500).send({
+      message: "email verification failed",
+      error: error,
+    });
+  }
+};
+
 // user login works
 exports.login = async (req, res) => {
   const { email, password } = req.body;

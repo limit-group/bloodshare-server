@@ -5,6 +5,5 @@ exports.generateOTP = () => {
     upperCaseAlphabets: false,
     specialChars: false,
   });
-
   return otp;
 };

@@ -1,4 +1,6 @@
+const { uploadImage } = require("../services/media.service");
 const prisma = require("../utils/db.utils");
+
 // user profile-works
 exports.getUserProfile = async (req, res) => {
   const user = req.user;
@@ -42,13 +44,20 @@ exports.addUserProfile = async (req, res) => {
 // works
 exports.updateUserProfile = async (req, res) => {
   const user = req.user;
-  const { name, dateOfBirth, bloodType } = req.body;
+  const { name, dateOfBirth, bloodType, avatar } = req.body;
+  const newAvatar = uploadImage(avatar);
+  if (!newAvatar) {
+    res.status(500).send({
+      message: "An Error Was encountered!",
+    });
+  }
   const profile = await prisma.userProfile.update({
     where: {
       userId: user.id,
     },
     data: {
       name: name,
+      avatar: newAvatar,
       dateOfBirth: dateOfBirth,
       bloodType: bloodType,
       streetName: streetName,

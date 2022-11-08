@@ -17,7 +17,6 @@ const jwtSign = (user) => {
 
 const isAuth = (req, res, next) => {
   const { authorization } = req.headers;
-
   if (authorization) {
     const token = authorization.slice(7, authorization.length);
     jwt.verify(token, process.env.JWT_SECRET, (err, decode) => {
