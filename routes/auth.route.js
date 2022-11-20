@@ -20,5 +20,5 @@ router.post("/mobileSignup", mobileSignup);
 router.post("/register", register);
 router.post("/verify", verifyMail);
 router.post("/updatePassword", isAuth, updatePassword);
-router.post("/create", createUser);
+router.post("/create", isAuth, createUser);
 module.exports = router;
