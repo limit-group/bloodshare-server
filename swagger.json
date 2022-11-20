@@ -1,6 +1,6 @@
 {
   "info": {
-    "title": "Dona API",
+    "title": "BloodCare API",
     "version": "1.0.0",
     "description": "API for Dona Web and Client"
   },
@@ -8,30 +8,146 @@
   "basePath": "/",
   "swagger": "2.0",
   "paths": {
-    "/auth/m-login": {
-      "parameters": [
-        {
-          "id": "id"
-        }
-      ],
-      "get": {
-        "operationId": "anotherRoute",
-        "summary": "another route",
-        "description": "another route",
+    "/auth/login": {
+      "post": {
+        "summary": "Login with email address",
+        "operationId": "emailLogin",
+        "description": "",
+        "parameters": {
+          "email": "johndoe@mail.com",
+          "in": "body",
+          "description": "login info",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/User"
+          }
+        },
         "produces": ["application/json"],
         "responses": {
           "200": {
-            "description": "200 response",
-            "examples": {
-              "application/json": "{ foo: 'bar' }"
+            "description": "successful login",
+            "schema": {
+              "$ref": "#/definitions/User"
             }
+          }
+        }
+      }
+    },
+    "/auth/mobile-login": {
+      "post": {
+        "summary": "Login with mobile number",
+        "description": "",
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "successful login"
+          }
+        }
+      }
+    },
+    "/auth/signup": {
+      "post": {
+        "summary": "Signup with email address",
+        "description": "",
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "successful signup"
+          }
+        }
+      }
+    },
+    "/auth/mobile-signup": {
+      "post": {
+        "summary": "Signup with mobile number",
+        "description": "",
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "successful mobile signup"
+          }
+        }
+      }
+    },
+    "/register": {
+      "post": {
+        "summary": "Facility Registration",
+        "description": "",
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "successful facility registration"
+          }
+        }
+      }
+    },
+    "/verify": {
+      "post": {
+        "summary": "Email Verification",
+        "description": "",
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "successful mail verification"
+          }
+        }
+      }
+    },
+    "/update-password": {
+      "post": {
+        "summary": "Password Update",
+        "description": "",
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "successful password update"
+          }
+        }
+      }
+    },
+    "create-user": {
+      "post": {
+        "summary": "User Creation",
+        "description": "",
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "successful user creation"
           }
         }
       }
     }
   },
-  "definitions": {},
-  "responses": {},
+  "definitions": {
+    "NewUser": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/User"
+        }
+      ]
+    }
+  },
+  "responses": {
+    "200": {
+      "description": "200 response"
+    },
+    "201": {
+      "description": "Created"
+    },
+    "401": {
+      "description": "Unauthorized"
+    },
+    "403": {
+      "description": "Bad Request"
+    },
+    "404": {
+      "description": "Not found"
+    },
+    "500": {
+      "description": "Internal Server Error"
+    }
+  },
   "parameters": {},
   "securityDefinitions": {}
 }
