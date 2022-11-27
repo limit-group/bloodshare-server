@@ -46,6 +46,7 @@ model Facility {
   name                        String                       @db.VarChar(255)
   verified                    Boolean                      @default(false)
   mission                     String
+  email                       String?
   streetName                  String
   streetNumber                String
   city                        String

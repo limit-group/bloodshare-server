@@ -96,7 +96,7 @@ exports.mobileSignup = async (req, res) => {
 
 // user signup by email
 exports.signup = async (req, res) => {
-  const { email, password, phone } = req.body;
+  const { email, password } = req.body;
   const otp = generateOTP();
   const user = await prisma.user.findUnique({
     where: {
@@ -110,7 +110,7 @@ exports.signup = async (req, res) => {
     const user = await prisma.user.create({
       data: {
         email: email.toLowerCase(),
-        phone: phone,
+        phone: "",
         password: encrypted,
         otp: otp,
       },
@@ -259,13 +259,15 @@ exports.verifyPhone = async (req, res) => {
 // user login works
 exports.login = async (req, res) => {
   const { email, password } = req.body;
+  // console.log(req.body);
   const user = await prisma.user.findUnique({
     where: {
       email: email,
     },
   });
+  // console.log(user);
   if (!user) {
-    res.json({
+    return res.status(404).json({
       message: "user with this email doesn't exist",
     });
   }
@@ -273,8 +275,12 @@ exports.login = async (req, res) => {
     const token = jwtSign(user);
     res.send({
       token: token,
-      role: user.role,
+      user: user,
       message: "authentication success",
+    });
+  } else {
+    res.status(401).send({
+      message: "Password doesn't match.",
     });
   }
 };
@@ -294,10 +300,14 @@ exports.mobileLogin = async (req, res) => {
   }
   if (user && bcrypt.compareSync(password, user.password)) {
     const token = jwtSign(user);
-    res.send({
+    res.status(200).send({
       token: token,
       role: user.role,
       message: "authentication success",
+    });
+  } else {
+    res.status(401).send({
+      message: "Password doesn't match.",
     });
   }
 };
