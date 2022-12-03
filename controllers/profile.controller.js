@@ -10,11 +10,11 @@ exports.getUserProfile = async (req, res) => {
     },
   });
   if (!profile) {
-    res.status(404).send({
+    return res.status(404).send({
       message: "profile requested not found!",
     });
   } else {
-    res.status(200).send(profile);
+    return res.status(200).send(profile);
   }
 };
 
@@ -31,12 +31,12 @@ exports.addUserProfile = async (req, res) => {
     },
   });
   if (!profile) {
-    res.status(500).send({
+    return res.status(500).send({
       message: "user profile failure",
       error: error,
     });
   } else {
-    res.status(201).send({
+    return res.status(201).send({
       message: "profile created",
       profile: profile,
     });
@@ -59,7 +59,7 @@ exports.updateUserProfile = async (req, res) => {
   } = req.body;
   const newAvatar = uploadImage(avatar);
   if (!newAvatar) {
-    res.status(500).send({
+    return res.status(500).send({
       message: "Profile Image is Important",
     });
   }
@@ -80,12 +80,12 @@ exports.updateUserProfile = async (req, res) => {
     },
   });
   if (!profile) {
-    res.status(500).send({
+    return res.status(500).send({
       message: "user profile failure",
       error: error,
     });
   } else {
-    res.status(200).send(profile);
+    return res.status(200).send(profile);
   }
 };
 // untested
@@ -138,12 +138,12 @@ exports.createFacility = async (req, res) => {
     },
   });
   if (!facility) {
-    res.status(500).send({
+    return res.status(500).send({
       message: "could not create facility profile",
     });
   } else {
-    res.status(201).send({
-      message: "Facility Information Loaded."
+    return res.status(201).send({
+      message: "Facility Information Loaded.",
     });
   }
 };
@@ -153,7 +153,7 @@ exports.verifyFacility = async (req, res) => {
   const user = req.user;
   const { licenseImage } = req.licenseImage;
   if (user.role !== "FACILITYADMIN") {
-    res.status(403).json({
+    return res.status(403).json({
       message: "forbidden action!",
     });
   } else {
@@ -168,15 +168,13 @@ exports.verifyFacility = async (req, res) => {
       },
     });
     if (!profile) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "an unexpected error occurred!",
       });
-    } else {
-      res.status(200).send(profile);
     }
+    res.status(200).send(profile);
   }
 };
-
 
 exports.getFacility = async (req, res) => {
   const profile = await prisma.facility.findUnique({
@@ -185,20 +183,19 @@ exports.getFacility = async (req, res) => {
     },
   });
   if (!profile) {
-    res.status(404).send({
+    return res.status(404).send({
       message: "facility profile unavailable!",
     });
-  } else {
-    res.status(200).send(profile);
   }
+  res.status(200).send(profile);
 };
 
 exports.deleteFacility = async (req, res) => {
-  const user = req.user
-  if(user.role != "SUPERADMIN") {
+  const user = req.user;
+  if (user.role != "SUPERADMIN") {
     return res.send({
-      message: "This action is out of reach, Haha."
-    })
+      message: "This action is out of reach, Haha.",
+    });
   }
 
   try {
@@ -216,5 +213,4 @@ exports.deleteFacility = async (req, res) => {
       message: "facility could not be deleted at this time try again later!",
     });
   }
-  
 };
