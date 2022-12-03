@@ -5,24 +5,33 @@ const { generateOTP } = require("../services/otp.service");
 const { sendMail } = require("../services/email.service");
 const { sendMessage } = require("../services/message.service");
 
-// check phone exists
-const checkPhone = async (phone) => {
+const validatePhoneOtp = async (phone, otp) => {
   const user = await prisma.user.findUnique({
     where: {
       phone: phone,
     },
   });
-
-  console.log(user);
-
+  console.log(otp);
   if (!user) {
-    return false;
+    return [false, "user doesn't exist"];
   }
-  return user;
+  if (user && user.otp !== otp) {
+    return [false, "invalid otp provided"];
+  }
+  const newUser = await prisma.user.update({
+    where: {
+      id: user.id,
+    },
+    data: {
+      verified: true,
+    },
+  });
+  return [true, newUser];
 };
-// validate otp
-const validateOTP = async (email, otp) => {
-  const user = await prisma.user.findUnique({
+
+// validate
+const validateEmailOtp = async (email, otp) => {
+  const user = await prisma.facility.findUnique({
     where: {
       email: email,
     },
@@ -60,7 +69,7 @@ exports.mobileSignup = async (req, res) => {
     },
   });
   if (user) {
-    res.send("user with this phone number exists");
+    res.send("User with this phone number exists!");
   } else {
     encrypted = generatePassword(password);
     const user = await prisma.user.create({
@@ -72,21 +81,21 @@ exports.mobileSignup = async (req, res) => {
     });
     if (!user) {
       res.status(500).send({
-        message: "unable to signup, please try again later",
+        message: "Unable to signup, please try again later!",
         error: error,
       });
     } else {
       try {
         await sendMessage({
           to: phone,
-          message: `enter this code  ${otp} to verify your account . Thank you`,
+          message: `Enter this code ${otp} to verify your account . Thank you.`,
         });
         res.status(200).json({
           user: jwtSign(user),
         });
       } catch (error) {
         res.status(500).send({
-          message: "unable to signup, please try again later",
+          message: "Unable to signup, please try again later!",
           error: error,
         });
       }
@@ -94,11 +103,11 @@ exports.mobileSignup = async (req, res) => {
   }
 };
 
-// user signup by email
+// user signup by email -only for facility
 exports.signup = async (req, res) => {
   const { email, password } = req.body;
   const otp = generateOTP();
-  const user = await prisma.user.findUnique({
+  const user = await prisma.facility.findUnique({
     where: {
       email: email,
     },
@@ -110,6 +119,7 @@ exports.signup = async (req, res) => {
     const user = await prisma.user.create({
       data: {
         email: email.toLowerCase(),
+        role: "FACILITYADMIN",
         phone: "",
         password: encrypted,
         otp: otp,
@@ -137,49 +147,11 @@ exports.signup = async (req, res) => {
   }
 };
 
-// facility registration
-exports.register = async (req, res) => {
-  const { email, password } = req.body;
-  const otp = generateOTP();
-  const user = await prisma.user.findUnique({
-    where: {
-      email: email,
-    },
-  });
-  if (user) {
-    res.send("user with this email exists");
-  } else {
-    encrypted = generatePassword(password);
-    const user = new prisma.user.create({
-      data: {
-        email: email.toLowerCase(),
-        password: encrypted,
-        role: "FACILITYADMIN",
-        otp: otp,
-      },
-    });
-
-    if (!user) {
-      try {
-        await sendMail({
-          to: email,
-          otp: otp,
-        });
-      } catch (error) {
-        res.status(500).send({
-          message: "unable to signup, please try again later",
-        });
-      }
-      return jwtSign(user);
-    }
-  }
-};
-
 // user creation with role in facility
 exports.createUser = async (req, res) => {
-  const { email, password, facility } = req.body;
+  const { email, password} = req.body;
   const otp = generateOTP();
-  const user = await prisma.user.findUnique({
+  const user = await prisma.facility.findUnique({
     where: {
       email: email,
     },
@@ -226,14 +198,14 @@ exports.createUser = async (req, res) => {
 exports.verifyMail = async (req, res) => {
   const { email, otp } = req.body;
   try {
-    const user = await validateOTP(email, otp);
+    const user = await validateEmailOtp(email, otp);
     res.status(200).send({
       message: "user verification success",
       user: user,
     });
   } catch (error) {
     res.status(500).send({
-      message: "email verification failed",
+      message: "Email verification failed!",
       error: error,
     });
   }
@@ -243,7 +215,7 @@ exports.verifyMail = async (req, res) => {
 exports.verifyPhone = async (req, res) => {
   const { phone, otp } = req.body;
   try {
-    const user = await validateOTP(email, otp);
+    const user = await validatePhoneOtp(phone, otp);
     res.status(200).send({
       message: "user verification success",
       user: user,
@@ -260,7 +232,7 @@ exports.verifyPhone = async (req, res) => {
 exports.login = async (req, res) => {
   const { email, password } = req.body;
   // console.log(req.body);
-  const user = await prisma.user.findUnique({
+  const user = await prisma.facility.findUnique({
     where: {
       email: email,
     },
@@ -312,7 +284,7 @@ exports.mobileLogin = async (req, res) => {
   }
 };
 
-// password change
+// password change - Can be used for both phone and email
 exports.updatePassword = async (req, res) => {
   encrypted = generatePassword(req.body.password);
   const user = await prisma.user.update({

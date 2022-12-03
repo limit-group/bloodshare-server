@@ -18,7 +18,6 @@ const profileRouter = require("./routes/profile.route");
 const donationRouter = require("./routes/donation.route");
 const addressRouter = require("./routes/address.route");
 const broadcastRouter = require("./routes/broadcast.route");
-const facilityRouter = require("./routes/facility.route");
 
 // app.use("api/", {
   
@@ -29,7 +28,6 @@ app.use("/api/", broadcastRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/profile", profileRouter);
 app.use("/api/address", addressRouter);
-app.use("/api/facility", facilityRouter);
 
 app.get("", (req, res) => {
   res.json({

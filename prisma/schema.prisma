@@ -3,11 +3,14 @@
 
 generator client {
   provider = "prisma-client-js"
+  engineType = "binary"
+  binaryTargets = ["windows"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  
 }
 
 enum Role {
@@ -29,7 +32,6 @@ enum BloodType {
 
 model User {
   id        Int          @id @default(autoincrement())
-  email     String?      @unique
   password  String
   phone     String?      @unique
   otp       String
@@ -44,15 +46,20 @@ model User {
 model Facility {
   id                          Int                          @id @default(autoincrement())
   name                        String                       @db.VarChar(255)
+  email                       String @unique
+  password                    String
+  otp                         String
+  emailVerified               Boolean @default(false)
+  role      Role         @default(FACILITYADMIN)
   verified                    Boolean                      @default(false)
-  mission                     String
-  email                       String?
-  streetName                  String
-  streetNumber                String
-  city                        String
-  country                     String
+  phone                       String?
+  mission                     String?
+  streetName                  String?
+  streetNumber                String?
+  city                        String?
+  country                     String?
   license                     String?
-  licenseNumber               String                       @unique
+  licenseNumber               String?                       @unique
   donation                    Donation[]
   donationBroadcasts          DonationBroadCast[]
   emergencydonationBroadcasts EmergencyDonationBroadCast[]
