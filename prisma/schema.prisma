@@ -39,6 +39,7 @@ model User {
   role      Role         @default(USER)
   profile   UserProfile?
   donations Donation[]
+  emergencyBroadCasts EmergencyBroadCast[]
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
 }
@@ -62,7 +63,7 @@ model Facility {
   licenseNumber               String?                       @unique
   donation                    Donation[]
   donationBroadcasts          DonationBroadCast[]
-  emergencydonationBroadcasts EmergencyDonationBroadCast[]
+  emergencydonationBroadcasts EmergencyBroadCast[]
   createdAt                   DateTime                     @default(now())
   updatedAt                   DateTime                     @updatedAt
 }
@@ -104,11 +105,13 @@ model DonationBroadCast {
   updatedAt   DateTime @updatedAt
 }
 
-model EmergencyDonationBroadCast {
+model EmergencyBroadCast {
   id          Int       @id @default(autoincrement())
   Facility    Facility  @relation(fields: [facilityId], references: [id])
   facilityId  Int
   description String    @db.VarChar(255)
+  User        User?     @relation(fields: [userId], references: [id])
+  userId      Int
   bloodType   BloodType
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
