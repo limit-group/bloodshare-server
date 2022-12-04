@@ -36,7 +36,7 @@ exports.donationFeed = async (req, res) => {
 
 exports.getDonationCentres = async (req, res) => {
   const filters = req.query;
-  const data = await prisma.user.findMany({});
+  const data = await prisma.facility.findMany({});
   console.log(data);
   const filteredCenters = data.filter((user) => {
     let isValid = true;

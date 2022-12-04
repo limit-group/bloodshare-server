@@ -41,6 +41,7 @@ const {
   createUser,
   mobileSignup,
   mobileLogin,
+  verifyPhone,
 } = require("../controllers/auth.controller");
 const { isAuth } = require("../middlewares/auth.middleware");
 const router = express.Router();
@@ -49,8 +50,8 @@ router.post("/login", login);
 router.post("/mobile-login", mobileLogin);
 router.post("/signup", signup);
 router.post("/mobile-signup", mobileSignup);
-// router.post("/register", register);
-router.post("/verify", verifyMail);
+router.post("/mobile-verify", isAuth, verifyPhone);
+router.post("/verify", isAuth, verifyMail);
 router.post("/update-password", isAuth, updatePassword);
 router.post("/create-user", isAuth, createUser);
 module.exports = router;

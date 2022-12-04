@@ -29,31 +29,6 @@ const validatePhoneOtp = async (phone, otp) => {
   return [true, newUser];
 };
 
-// validate
-const validateEmailOtp = async (email, otp) => {
-  const user = await prisma.facility.findUnique({
-    where: {
-      email: email,
-    },
-  });
-  console.log(otp);
-  if (!user) {
-    return [false, "user doesn't exist"];
-  }
-  if (user && user.otp !== otp) {
-    return [false, "invalid otp provided"];
-  }
-  const newUser = await prisma.user.update({
-    where: {
-      id: user.id,
-    },
-    data: {
-      verified: true,
-    },
-  });
-  return [true, newUser];
-};
-
 const generatePassword = (password) => {
   encrypted = bcrypt.hashSync(password, 10);
   return encrypted;
@@ -105,51 +80,52 @@ exports.mobileSignup = async (req, res) => {
 
 // user signup by email -only for facility
 exports.signup = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, name } = req.body;
   const otp = generateOTP();
-  const user = await prisma.facility.findUnique({
+  const checkUser = await prisma.facility.findUnique({
     where: {
       email: email,
     },
   });
-  if (user) {
-    res.send("user with this email exists");
-  } else {
-    encrypted = generatePassword(password);
-    const user = await prisma.user.create({
-      data: {
-        email: email.toLowerCase(),
-        role: "FACILITYADMIN",
-        phone: "",
-        password: encrypted,
-        otp: otp,
-      },
+  if (checkUser) {
+    return res.send("user with this email exists");
+  }
+
+  encrypted = generatePassword(password);
+  const user = await prisma.facility.create({
+    data: {
+      email: email.toLowerCase(),
+      role: "FACILITYADMIN",
+      phone: "",
+      name: name,
+      password: encrypted,
+      otp: otp,
+    },
+  });
+  if (!user) {
+    res.status(500).send({
+      message: "unable to signup, please try again later",
+      error: error,
     });
-    if (!user) {
+  } else {
+    try {
+      await sendMail({
+        to: email,
+        otp: otp,
+      });
+      res.status(200).json({ token: jwtSign(user) });
+    } catch (error) {
+      console.log(error);
       res.status(500).send({
         message: "unable to signup, please try again later",
-        error: error,
       });
-    } else {
-      try {
-        await sendMail({
-          to: email,
-          otp: otp,
-        });
-        res.status(200).json({ token: jwtSign(user) });
-      } catch (error) {
-        console.log(error);
-        res.status(500).send({
-          message: "unable to signup, please try again later",
-        });
-      }
     }
   }
 };
 
 // user creation with role in facility
 exports.createUser = async (req, res) => {
-  const { email, password} = req.body;
+  const { email, password } = req.body;
   const otp = generateOTP();
   const user = await prisma.facility.findUnique({
     where: {
@@ -194,28 +170,55 @@ exports.createUser = async (req, res) => {
   }
 };
 
+// validate
+const validateEmailOtp = async (email, otp) => {
+  const user = await prisma.facility.findUnique({
+    where: {
+      email: email,
+    },
+  });
+  console.log(otp);
+  if (!user) {
+    return [false, "user doesn't exist"];
+  }
+  if (user && user.otp !== otp) {
+    return [false, "invalid otp provided"];
+  }
+  const newUser = await prisma.user.update({
+    where: {
+      id: user.id,
+    },
+    data: {
+      verified: true,
+    },
+  });
+  return [true, newUser];
+};
+
 // email verification works
 exports.verifyMail = async (req, res) => {
-  const { email, otp } = req.body;
-  try {
-    const user = await validateEmailOtp(email, otp);
-    res.status(200).send({
-      message: "user verification success",
-      user: user,
-    });
-  } catch (error) {
+  const facility = req.user;
+  console.log(facility);
+  const { otp } = req.body;
+  const user = await validateEmailOtp(facility.email, otp);
+  if (!user) {
     res.status(500).send({
       message: "Email verification failed!",
       error: error,
     });
   }
+  console.log(user);
+  res.status(200).send({
+    message: "user verification success",
+  });
 };
 
 // phone number verification
 exports.verifyPhone = async (req, res) => {
-  const { phone, otp } = req.body;
+  const user = req.user;
+  const { otp } = req.body;
   try {
-    const user = await validatePhoneOtp(phone, otp);
+    const user = await validatePhoneOtp(user.phone, otp);
     res.status(200).send({
       message: "user verification success",
       user: user,
@@ -232,17 +235,18 @@ exports.verifyPhone = async (req, res) => {
 exports.login = async (req, res) => {
   const { email, password } = req.body;
   // console.log(req.body);
-  const user = await prisma.facility.findUnique({
+  const checkUser = await prisma.facility.findUnique({
     where: {
       email: email,
     },
   });
-  // console.log(user);
-  if (!user) {
+  console.log(checkUser);
+  if (!checkUser) {
     return res.status(404).json({
       message: "user with this email doesn't exist",
     });
   }
+
   if (user && bcrypt.compareSync(password, user.password)) {
     const token = jwtSign(user);
     res.send({

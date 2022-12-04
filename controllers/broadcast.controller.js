@@ -22,7 +22,7 @@ exports.emergencyBroadcast = async (req, res) => {
     },
   });
 
-  if (!facility) {
+  if (!broadcast) {
     return res.status(500).send({
       message: "Could not send brodcast",
     });
