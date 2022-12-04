@@ -4,6 +4,10 @@ const {
   addUserProfile,
   updateUserProfile,
   deleteUserProfile,
+  createFacility,
+  verifyFacility,
+  getFacility,
+  deleteFacility,
 } = require("../controllers/profile.controller");
 const { isAuth } = require("../middlewares/auth.middleware");
 const router = express.Router();

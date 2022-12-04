@@ -19,9 +19,6 @@ const donationRouter = require("./routes/donation.route");
 const addressRouter = require("./routes/address.route");
 const broadcastRouter = require("./routes/broadcast.route");
 
-// app.use("api/", {
-  
-// })
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/api/", donationRouter);
 app.use("/api/", broadcastRouter);

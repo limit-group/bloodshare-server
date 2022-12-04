@@ -49,7 +49,7 @@ router.post("/login", login);
 router.post("/mobile-login", mobileLogin);
 router.post("/signup", signup);
 router.post("/mobile-signup", mobileSignup);
-router.post("/register", register);
+// router.post("/register", register);
 router.post("/verify", verifyMail);
 router.post("/update-password", isAuth, updatePassword);
 router.post("/create-user", isAuth, createUser);
