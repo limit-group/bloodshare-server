@@ -7,7 +7,7 @@ const jwtSign = (user) => {
       email: user.email,
       role: user.role,
       name: user.name,
-      phone: user.phone
+      phone: user.phone,
     },
     process.env.JWT_SECRET,
     {
@@ -22,7 +22,7 @@ const isAuth = (req, res, next) => {
     const token = authorization.slice(7, authorization.length);
     jwt.verify(token, process.env.JWT_SECRET, (err, decode) => {
       if (err) {
-        res.status(400).send("token provide not valid");
+        res.status(400).send({ message: "token provide not valid" });
       } else {
         req.user = decode;
         next();

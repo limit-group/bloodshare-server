@@ -19,7 +19,8 @@ module.exports.sendMail = async (params) => {
                 <h2>Thank you for taking a step into saving lives.</h2>
                 <p  style="margin-bottom: 30px">Please enter the sign up OTP to start with the bigger life saving mission</p>
                 <h1 style="font-size: 40px; letter-spacing: 2px; text-align: center;">${params.otp}</h1>
-                <p style="margin-top: 30px;">emergen-care team</p>
+                <p style="margin-top: 30px;">We appreciate You</p>
+                <p>EmergenCare Team</p>
             </div>
 `,
     });

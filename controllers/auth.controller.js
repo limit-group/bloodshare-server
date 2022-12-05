@@ -87,6 +87,7 @@ exports.signup = async (req, res) => {
       email: email,
     },
   });
+
   if (checkUser) {
     return res.send("user with this email exists");
   }
@@ -113,7 +114,9 @@ exports.signup = async (req, res) => {
         to: email,
         otp: otp,
       });
-      res.status(200).json({ token: jwtSign(user) });
+      const token = jwtSign(user);
+      // console.log(token);
+      res.status(200).json({ token: token });
     } catch (error) {
       console.log(error);
       res.status(500).send({
@@ -177,10 +180,10 @@ const validateEmailOtp = async (email, otp) => {
       email: email,
     },
   });
-  console.log(otp);
   if (!user) {
     return [false, "user doesn't exist"];
   }
+  
   if (user && user.otp !== otp) {
     return [false, "invalid otp provided"];
   }
