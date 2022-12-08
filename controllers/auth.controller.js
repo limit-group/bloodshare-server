@@ -11,7 +11,6 @@ const validatePhoneOtp = async (phone, otp) => {
       phone: phone,
     },
   });
-  console.log(otp);
   if (!user) {
     return [false, "user doesn't exist"];
   }
@@ -44,7 +43,7 @@ exports.mobileSignup = async (req, res) => {
     },
   });
   if (user) {
-    res.send("User with this phone number exists!");
+    return res.send("User with this phone number exists!");
   } else {
     encrypted = generatePassword(password);
     const user = await prisma.user.create({
@@ -55,7 +54,7 @@ exports.mobileSignup = async (req, res) => {
       },
     });
     if (!user) {
-      res.status(500).send({
+      return res.status(500).send({
         message: "Unable to signup, please try again later!",
         error: error,
       });
@@ -65,11 +64,11 @@ exports.mobileSignup = async (req, res) => {
           to: phone,
           message: `Enter this code ${otp} to verify your account . Thank you.`,
         });
-        res.status(200).json({
+        return res.status(200).json({
           user: jwtSign(user),
         });
       } catch (error) {
-        res.status(500).send({
+        return res.status(500).send({
           message: "Unable to signup, please try again later!",
           error: error,
         });
@@ -104,7 +103,7 @@ exports.signup = async (req, res) => {
     },
   });
   if (!user) {
-    res.status(500).send({
+    return res.status(500).send({
       message: "unable to signup, please try again later",
       error: error,
     });
@@ -136,7 +135,7 @@ exports.createUser = async (req, res) => {
     },
   });
   if (user) {
-    res.send("user with this email exists");
+    return res.send("user with this email exists");
   } else {
     encrypted = generatePassword(password);
     const user = new prisma.user.create({
@@ -149,7 +148,7 @@ exports.createUser = async (req, res) => {
     });
 
     if (!user) {
-      res.status(500).send({
+      return res.status(500).send({
         message: "unable to create user, please try again later",
       });
     } else {
@@ -205,7 +204,7 @@ exports.verifyMail = async (req, res) => {
   const { otp } = req.body;
   const user = await validateEmailOtp(facility.email, otp);
   if (!user) {
-    res.status(500).send({
+    return res.status(500).send({
       message: "Email verification failed!",
       error: error,
     });
@@ -218,10 +217,10 @@ exports.verifyMail = async (req, res) => {
 
 // phone number verification
 exports.verifyPhone = async (req, res) => {
-  const user = req.user;
+  const u = req.user;
   const { otp } = req.body;
   try {
-    const user = await validatePhoneOtp(user.phone, otp);
+    const user = await validatePhoneOtp(u.phone, otp);
     res.status(200).send({
       message: "user verification success",
       user: user,

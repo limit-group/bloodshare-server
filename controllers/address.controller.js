@@ -8,7 +8,7 @@ exports.getUserAddress = async (req, res) => {
       },
     });
     if (!profile) {
-      res.status(500).send({
+      return res.status(500).send({
         message: "could not get user address!",
       });
     } else {
@@ -19,7 +19,7 @@ exports.getUserAddress = async (req, res) => {
         city: profile.city,
         country: profile.country,
       };
-      res.status(200).send(address);
+      return res.status(200).send(address);
     }
   } catch (error) {
     console.log(error);
@@ -44,11 +44,11 @@ exports.getFacilityAddress = async (req, res) => {
       country: profile.country,
     };
     if (!profile) {
-      res.status(500).send({
+      return res.status(500).send({
         message: "could not get facility address!",
       });
     } else {
-      res.status(200).send(address);
+      return res.status(200).send(address);
     }
   } catch (error) {
     res.status(400).send({
