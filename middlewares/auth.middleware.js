@@ -22,7 +22,7 @@ const isAuth = (req, res, next) => {
     const token = authorization.slice(7, authorization.length);
     jwt.verify(token, process.env.JWT_SECRET, (err, decode) => {
       if (err) {
-        res.status(400).send({ message: "token provide not valid" });
+        res.status(400).send({ message: "token provided not valid" });
       } else {
         req.user = decode;
         next();

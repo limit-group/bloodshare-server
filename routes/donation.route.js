@@ -1,12 +1,14 @@
 const express = require("express");
 const {
-  getDonationCentres,
-  scheduleDonation,
-  donationFeed,
+  getDonationFeed,
+  createDonationFeed,
+  myDonations,
+  donated,
 } = require("../controllers/donation.controller");
 const { isAuth } = require("../middlewares/auth.middleware");
 const router = express.Router();
-router.get("/centres", isAuth, getDonationCentres);
-router.post("/schedule", isAuth, scheduleDonation);
-router.get("/feed", isAuth, donationFeed);
+router.get("/feeds", isAuth, getDonationFeed);
+router.post("/feeds", isAuth, createDonationFeed);
+router.get("/donations", isAuth, myDonations);
+router.post("/donations", isAuth, donated);
 module.exports = router;

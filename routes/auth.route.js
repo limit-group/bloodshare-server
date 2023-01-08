@@ -1,44 +1,7 @@
-/*
-  @swagger
-   components:
-     schemas:
-       Book:
-         type: object
-         required:
-           - title
-           - author
-           - finished
-         properties:
-           id:
-             type: integer
-             description: The auto-generated id of the book.
-           title:
-             type: string
-             description: The title of your book.
-           author:
-             type: string
-             description: Who wrote the book?
-           finished:
-             type: boolean
-             description: Have you finished reading it?
-           createdAt:
-             type: string
-             format: date
-             description: The date of the record creation.
-         example:
-            title: The Pragmatic Programmer
-            author: Andy Hunt / Dave Thomas
-            finished: true
- */
 const express = require("express");
 const {
-  login,
-  signup,
-  register,
   endpoint,
-  verifyMail,
   updatePassword,
-  createUser,
   mobileSignup,
   mobileLogin,
   verifyPhone,
@@ -46,12 +9,8 @@ const {
 const { isAuth } = require("../middlewares/auth.middleware");
 const router = express.Router();
 router.get("", endpoint);
-router.post("/login", login);
-router.post("/mobile-login", mobileLogin);
-router.post("/signup", signup);
-router.post("/mobile-signup", mobileSignup);
-router.post("/mobile-verify", isAuth, verifyPhone);
-router.post("/verify", isAuth, verifyMail);
-router.post("/update-password", isAuth, updatePassword);
-router.post("/create-user", isAuth, createUser);
+router.post("/login", mobileLogin);
+router.post("/signup", mobileSignup);
+router.post("/verify", isAuth, verifyPhone);
+router.post("/password", isAuth, updatePassword);
 module.exports = router;
