@@ -4,7 +4,7 @@ const prisma = require("../utils/db.utils");
 exports.getEmergencyFeed = async (req, res) => {
   try {
     // TODO: Get latest
-    const broadcasts = await prisma.donation.findMany();
+    const broadcasts = await prisma.donation.findMany({});
     res.status(200).send(broadcasts);
   } catch (error) {
     console.log(error);
