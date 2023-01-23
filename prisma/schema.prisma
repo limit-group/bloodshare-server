@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider      = "prisma-client-js"
+  provider = "prisma-client-js"
   // engineType    = "binary"
   // binaryTargets = ["windows"]
 }
@@ -30,49 +30,48 @@ enum BloodType {
 }
 
 model User {
-  id                  Int                  @id @default(autoincrement())
-  password            String
-  phoneNumber               String              @unique
-  verified            Boolean              @default(false)
-  role                Role                 @default(USER)
-  profile             Profile?
-  donations           Donation[]
+  id            Int             @id @default(autoincrement())
+  password      String
+  phoneNumber   String          @unique
+  verified      Boolean         @default(false)
+  role          Role            @default(USER)
+  profile       Profile?
+  donations     Donation[]
   emergencyFeed EmergencyFeed[]
-  donationFeed   DonationFeed[]
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
+  donationFeed  DonationFeed[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
 }
 
-
 model Profile {
-  id           Int       @id @default(autoincrement())
-  user         User      @relation(fields: [userId], references: [id])
-  userId       Int       @unique
-  name         String
-  avatar       String
-  dateOfBirth  String
-  bloodType    BloodType  @unique
+  id          Int       @id @default(autoincrement())
+  user        User      @relation(fields: [userId], references: [id])
+  userId      Int       @unique
+  name        String
+  avatar      String
+  dateOfBirth String
+  bloodType   BloodType @unique
   latitude    String
   longitude   String
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Donation {
-  id         Int      @id @default(autoincrement())
-  donor      User     @relation(fields: [donorId], references: [id])
-  donorId    Int      @unique
-  donorNumber  String  
+  id          Int      @id @default(autoincrement())
+  donor       User     @relation(fields: [donorId], references: [id])
+  donorId     Int      @unique
+  donorNumber String
   facility    String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model DonationFeed {
   id          Int      @id @default(autoincrement())
-  user    User @relation(fields: [userId], references: [id])
-  userId  Int
-  media    String
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int
+  media       String
   description String   @db.VarChar(255)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

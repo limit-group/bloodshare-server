@@ -4,7 +4,7 @@ const {
   createDonationFeed,
   myDonations,
   donated,
-} = require("../controllers/donation.controller");
+} = require("../controllers/feed.controller");
 const { isAuth } = require("../middlewares/auth.middleware");
 const router = express.Router();
 router.get("/feeds", isAuth, getDonationFeed);

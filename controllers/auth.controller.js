@@ -87,16 +87,17 @@ exports.mobileLogin = async (req, res) => {
     },
   });
   if (!user) {
-    res.json("user with this phone number doesn't exist");
+    return res.json("user with this phone number doesn't exist");
   }
   if (user && bcrypt.compareSync(password, user.password)) {
-    res.status(200).send({
+    return res.status(200).send({
       token: jwtSign(user),
       message: "authentication success",
     });
   } else {
-    res.status(401).send("Wrong Password provided.");
+    return res.status(401).send("Wrong Password provided.");
   }
+  res.status(500)
 };
 
 // phone number verification

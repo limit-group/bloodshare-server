@@ -15,8 +15,8 @@ app.use(
 );
 const authRouter = require("./routes/auth.route");
 const profileRouter = require("./routes/profile.route");
-const donationRouter = require("./routes/donation.route");
-const emergencyRouter = require("./routes/emergency.route");
+const donationRouter = require("./routes/feed.route");
+const emergencyRouter = require("./routes/request.route");
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/api", donationRouter);

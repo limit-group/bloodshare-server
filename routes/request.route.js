@@ -2,9 +2,9 @@ const express = require("express");
 const {
   getEmergencyFeed,
   emergencyFeed,
-} = require("../controllers/emergency.controller");
+} = require("../controllers/request.controller");
 const { isAuth } = require("../middlewares/auth.middleware");
 const router = express.Router();
-router.get("/e-feeds",  getEmergencyFeed);
-router.post("/e-feeds", isAuth, emergencyFeed);
+router.get("/requests",  getEmergencyFeed);
+router.post("/requests", isAuth, emergencyFeed);
 module.exports = router;
