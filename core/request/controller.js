@@ -1,10 +1,25 @@
 const prisma = require("../../utils/db.utils");
 
-// List emergency feed
-exports.getEmergencyFeed = async (req, res) => {
+exports.requestByMe = async (req, res) => {
   try {
     // TODO: Get latest
-    const broadcasts = await prisma.donation.findMany({});
+    const broadcasts = await prisma.request.findMany({
+      where: {
+        userId: req.user.id,
+      },
+    });
+    res.status(200).send(broadcasts);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("something went wrong!");
+  }
+};
+
+// List emergency feed
+exports.getRequest = async (req, res) => {
+  try {
+    // TODO: Get latest
+    const broadcasts = await prisma.request.findMany({});
     res.status(200).send(broadcasts);
   } catch (error) {
     console.log(error);
@@ -13,9 +28,9 @@ exports.getEmergencyFeed = async (req, res) => {
 };
 
 // share emergency donation feed
-exports.emergencyFeed = async (req, res) => {
+exports.createRequest = async (req, res) => {
   const { bloodType, description } = req.body;
-  const broadcast = await prisma.emergencyFeed.create({
+  const broadcast = await prisma.request.create({
     data: {
       userId: req.user.id,
       bloodType: bloodType,
@@ -24,29 +39,34 @@ exports.emergencyFeed = async (req, res) => {
   });
   if (!broadcast) {
     return res.status(500).send({
-      message: "Could not send emergency feed",
+      message: "Could not send blood request",
     });
   }
+
+  // TODO: query users to send the request alerts
   res.status(201).send("Shared Successfully");
 };
 
 //when someone accept to donate
 exports.acceptBroadcast = async (req, res) => {
   const user = req.user;
-  const { accept, facility } = req.body;
+  const { accept, requestId } = req.body;
 
   if (checkAccepted(facility)) {
     return res.status(200).send({
-      message: "Broadcast Closed.",
+      message: "people have already accepted to donate,.",
     });
   }
-  const broadcast = await prisma.emergencyBroadcast.update({
+  const broadcast = await prisma.request.update({
     where: {
-      facilityId: facility,
+      id: requestId,
+    },
+    data: {
       accept: accept + 1,
-      userId: user.id,
     },
   });
+
+  // TODO: Send message with directions.
 
   if (!broadcast) {
     return res.status(500).send({
@@ -61,7 +81,7 @@ exports.acceptBroadcast = async (req, res) => {
 
 async function checkAccepted(facilityId) {
   const acceptCount = 3;
-  const facility = await prisma.emergencyBroadcast.findUnique({
+  const facility = await prisma.request.findUnique({
     where: {
       id: facilityId,
     },

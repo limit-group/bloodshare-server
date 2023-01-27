@@ -89,6 +89,7 @@ model Request {
   bloodGroup   BloodType
   latitude    String
   longitude   String
+  accept      Int @default(0)
   description String    @db.VarChar(255)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt

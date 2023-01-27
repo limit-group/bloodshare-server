@@ -4,7 +4,7 @@ const prisma = require("../../utils/db.utils");
 // feeds by user id
 
 exports.feedsByMe = async (req, res) => {
-  const donations = await prisma.donationFeed.findMany({
+  const donations = await prisma.feed.findMany({
     where: {
       userId: req.user.id,
     },
@@ -20,7 +20,7 @@ exports.feedsByMe = async (req, res) => {
 // fecth donation feed.
 exports.getFeeds = async (req, res) => {
   // TODO: Filter by latest date.
-  const donations = await prisma.donationFeed.findMany();
+  const donations = await prisma.feed.findMany();
   if (!donations) {
     return res.status(500).send({
       message: "Failed to fetch donation feed.",
@@ -35,7 +35,7 @@ exports.createFeed = async (req, res) => {
   if (!feed_url) {
     return res.status(500).send("Failed to create feed.");
   }
-  const donation = await prisma.donationFeed.create({
+  const donation = await prisma.feed.create({
     data: {
       description: description,
       media: feed_url,
