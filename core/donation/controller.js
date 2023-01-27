@@ -23,7 +23,20 @@ exports.donated = async (req, res) => {
     },
   });
   if (!donation) {
-    res.status(500).send("Failed to record donation.");
+    return res.status(500).send("Failed to record donation.");
+  }
+
+  const profile = await prisma.profile.update({
+    where: {
+      userId: req.user.id,
+    },
+    data: {
+      bloodPoints: bloodPoints + 10,
+    },
+  });
+
+  if (!profile) {
+    return res.status(500).send("Failed to record donation.");
   }
   res.send(201).send("Donation Saved.");
 };
