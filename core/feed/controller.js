@@ -1,5 +1,5 @@
-const { uploadImage } = require("../../../services/media.service");
-const prisma = require("../../../utils/db.utils");
+const { uploadImage } = require("../../services/media.service");
+const prisma = require("../../utils/db.utils");
 
 // fecth donation feed.
 exports.getDonationFeed = async (req, res) => {

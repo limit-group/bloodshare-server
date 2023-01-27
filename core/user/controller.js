@@ -1,8 +1,8 @@
-const prisma = require("../../../utils/db.utils");
+const prisma = require("../../utils/db.utils");
 const bcrypt = require("bcryptjs");
-const { jwtSign } = require("../../../middlewares/auth.middleware");
-const { generateOTP } = require("../../../services/otp.service");
-const { sendMessage } = require("../../../services/message.service");
+const { jwtSign } = require("../../middlewares/auth.middleware");
+const { generateOTP } = require("../../services/otp.service");
+const { sendMessage } = require("../../services/message.service");
 
 // EPI
 exports.endpoint = (req, res) => {

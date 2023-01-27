@@ -1,5 +1,5 @@
 const express = require("express");
-const { isAuth } = require("../../../middlewares/auth.middleware");
+const { isAuth } = require("../../middlewares/auth.middleware");
 const {
   mobileLogin,
   mobileSignup,
@@ -8,6 +8,7 @@ const {
   getUserProfile,
   addUserProfile,
   updateUserProfile,
+  endpoint,
 } = require("./controller");
 const router = express.Router();
 router.get("", endpoint);
