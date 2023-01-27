@@ -1,4 +1,4 @@
-const prisma = require("../utils/db.utils");
+const prisma = require("../../../utils/db.utils");
 
 // List emergency feed
 exports.getEmergencyFeed = async (req, res) => {

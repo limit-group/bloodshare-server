@@ -1,6 +1,0 @@
-
-const notify = () => {
-    
-}
-
-chek

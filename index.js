@@ -13,16 +13,16 @@ app.use(
     extended: true,
   })
 );
-const authRouter = require("./routes/auth.route");
-const profileRouter = require("./routes/profile.route");
-const donationRouter = require("./routes/feed.route");
-const emergencyRouter = require("./routes/request.route");
+const authRouter = require("./core/user/route");
+const donationRouter = require("./core/donation/route");
+const requestRouter = require("./core/request/route");
+const feedRouter = require("./core/feed/route");
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/api", donationRouter);
-app.use("/api", emergencyRouter);
+app.use("/api", requestRouter);
 app.use("/api/auth", authRouter);
-app.use("/api", profileRouter);
+app.use("/api", feedRouter);
 
 app.get("", (req, res) => {
   res.json({
