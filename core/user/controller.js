@@ -75,7 +75,7 @@ exports.mobileSignup = async (req, res) => {
   if (!info) {
     return res.status(500).send("Unable to signup, please try again later!");
   }
-  res.status(200).send(jwtSign(user));
+  res.status(200).send(user);
 };
 
 // user login works
@@ -97,7 +97,6 @@ exports.mobileLogin = async (req, res) => {
   } else {
     return res.status(401).send("Wrong Password provided.");
   }
-  res.status(500);
 };
 
 // phone number verification
@@ -160,7 +159,7 @@ exports.addUserProfile = async (req, res) => {
       name: name,
       dateOfBirth: dateOfBirth,
       bloodType: bloodType,
-      image: image_url,
+      avatar: image_url,
       latitude: latitude,
       longitude: longitude,
     },
@@ -181,7 +180,7 @@ exports.addUserProfile = async (req, res) => {
 // works -- can be updated.
 exports.updateUserProfile = async (req, res) => {
   const user = req.user;
-  const { name, dateOfBirth, bloodType, avatar } = req.body;
+  const { name, dateOfBirth, bloodType, avatar, latitude, longitude} = req.body;
   const newAvatar = uploadImage(avatar);
   if (!newAvatar) {
     return res.status(500).send({
@@ -197,6 +196,8 @@ exports.updateUserProfile = async (req, res) => {
       avatar: newAvatar,
       dateOfBirth: dateOfBirth,
       bloodType: bloodType,
+      latitude: latitude,
+      longitude: longitude
     },
   });
   if (!profile) {
