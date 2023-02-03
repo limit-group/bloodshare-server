@@ -30,50 +30,51 @@ enum BloodType {
 }
 
 model User {
-  id            Int             @id @default(autoincrement())
-  password      String
-  phoneNumber   String          @unique
-  verified      Boolean         @default(false)
-  role          Role            @default(USER)
-  profile       Profile?
-  donations     Donation[]
-  requests Request[]
-  feeds  Feed[]
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  id          Int        @id @default(autoincrement())
+  password    String
+  phoneNumber String     @unique
+  otp         String
+  verified    Boolean    @default(false)
+  role        Role       @default(USER)
+  profile     Profile?
+  donations   Donation[]
+  requests    Request[]
+  feeds       Feed[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 }
 
 model Profile {
   id          Int       @id @default(autoincrement())
   user        User      @relation(fields: [userId], references: [id])
   userId      Int       @unique
-  name        String   @db.VarChar(255)
+  name        String    @db.VarChar(255)
   avatar      String
-  dateOfBirth DateTime 
+  dateOfBirth DateTime
   bloodType   BloodType @unique
   latitude    String
   longitude   String
-  bloodPoints   Int          @default(0)
+  bloodPoints Int       @default(0)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }
 
 model Donation {
-  id          Int      @id @default(autoincrement())
-  donor       User     @relation(fields: [donorId], references: [id])
-  donorId     Int      @unique
-  donorNumber Int
-  facility    String
-  donationDate  String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           Int      @id @default(autoincrement())
+  donor        User     @relation(fields: [donorId], references: [id])
+  donorId      Int      @unique
+  donorNumber  Int
+  facility     String
+  donationDate String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Feed {
   id          Int      @id @default(autoincrement())
   user        User     @relation(fields: [userId], references: [id])
   userId      Int
-  media       String
+  media       String?
   latitude    String?
   longitude   String?
   information String   @db.VarChar(255)
@@ -85,11 +86,11 @@ model Request {
   id          Int       @id @default(autoincrement())
   User        User?     @relation(fields: [userId], references: [id])
   userId      Int
-  date        DateTime @default(now())
-  bloodGroup   BloodType
+  date        DateTime  @default(now())
+  bloodGroup  BloodType
   latitude    String
   longitude   String
-  accept      Int @default(0)
+  accept      Int       @default(0)
   description String    @db.VarChar(255)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt

@@ -7,6 +7,7 @@ const africastalking = AfricasTalking({
 
 // TODO: Complete the AT messaging Service
 module.exports.sendSMS = async (params) => {
+  console.log(params)
   try {
     let info = await africastalking.SMS.send({
       to: `${params.to}`,

@@ -2,7 +2,7 @@ const prisma = require("../../utils/db.utils");
 const bcrypt = require("bcryptjs");
 const { jwtSign } = require("../../middlewares/auth.middleware");
 const { generateOTP } = require("../../services/otp.service");
-const { sendMessage } = require("../../services/message.service");
+const { sendSMS } = require("../../services/message.service");
 
 // EPI
 exports.endpoint = (req, res) => {
@@ -12,11 +12,11 @@ exports.endpoint = (req, res) => {
 };
 
 // validate otp sent via sms.
-const validatePhoneOtp = async (phone, otp) => {
+const validatePhoneOtp = async (id, otp) => {
   // check user
   const user = await prisma.user.findUnique({
     where: {
-      phoneNumber: phone,
+      id: id,
     },
   });
   if (!user) {
@@ -53,7 +53,9 @@ exports.mobileSignup = async (req, res) => {
     },
   });
   if (user) {
-    return res.status(400).send("User with this phone number exists!");
+    return res
+      .status(400)
+      .send({ message: "User with this phone number exists!" });
   }
   // create new user
   const new_user = await prisma.user.create({
@@ -67,7 +69,7 @@ exports.mobileSignup = async (req, res) => {
     return res.status(500).send("Unable to signup, please try again later!");
   }
   // send otp message.
-  const info = await sendMessage({
+  const info = await sendSMS({
     to: phone,
     message: `Enter this code ${otp} to verify your account . Thank you.`,
   });
@@ -87,7 +89,9 @@ exports.mobileLogin = async (req, res) => {
     },
   });
   if (!user) {
-    return res.json("user with this phone number doesn't exist");
+    return res
+      .status(400)
+      .json({ message: "user with this phone number doesn't exist" });
   }
   if (user && bcrypt.compareSync(password, user.password)) {
     return res.status(200).send({
@@ -103,7 +107,7 @@ exports.mobileLogin = async (req, res) => {
 exports.verifyPhone = async (req, res) => {
   const u = req.user;
   const { otp } = req.body;
-  const user = await validatePhoneOtp(u.phone, otp);
+  const user = await validatePhoneOtp(u.id, otp);
   if (!user) {
     res.status(500).send("email verification failed");
   }
@@ -180,7 +184,8 @@ exports.addUserProfile = async (req, res) => {
 // works -- can be updated.
 exports.updateUserProfile = async (req, res) => {
   const user = req.user;
-  const { name, dateOfBirth, bloodType, avatar, latitude, longitude} = req.body;
+  const { name, dateOfBirth, bloodType, avatar, latitude, longitude } =
+    req.body;
   const newAvatar = uploadImage(avatar);
   if (!newAvatar) {
     return res.status(500).send({
@@ -197,7 +202,7 @@ exports.updateUserProfile = async (req, res) => {
       dateOfBirth: dateOfBirth,
       bloodType: bloodType,
       latitude: latitude,
-      longitude: longitude
+      longitude: longitude,
     },
   });
   if (!profile) {
