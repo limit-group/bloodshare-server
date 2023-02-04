@@ -19,6 +19,11 @@ enum Role {
   SUPERADMIN
 }
 
+enum Req {
+  SELF
+  OTHERS
+}
+
 enum BloodType {
   A_POSITIVE
   A_NEGATIVE
@@ -65,7 +70,7 @@ model Donation {
   donorId      Int      @unique
   donorNumber  Int
   facility     String
-  donationDate String
+  donationDate DateTime @default(now())
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
@@ -75,23 +80,24 @@ model Feed {
   user        User     @relation(fields: [userId], references: [id])
   userId      Int
   media       String?
-  latitude    String?
-  longitude   String?
   information String   @db.VarChar(255)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
 model Request {
-  id          Int       @id @default(autoincrement())
-  User        User?     @relation(fields: [userId], references: [id])
-  userId      Int
-  date        DateTime  @default(now())
-  bloodGroup  BloodType
-  latitude    String
-  longitude   String
-  accept      Int       @default(0)
-  description String    @db.VarChar(255)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id           Int       @id @default(autoincrement())
+  User         User?     @relation(fields: [userId], references: [id])
+  userId       Int
+  requestType  Req       @default(OTHERS)
+  date         DateTime  @default(now())
+  bloodGroup   BloodType
+  latitude     String
+  longitude    String
+  bloodUnits   Int       @default(0)
+  patientName  String    @db.VarChar(255)
+  relationship String    @db.VarChar(255)
+  accept       Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }

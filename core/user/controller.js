@@ -103,15 +103,15 @@ exports.mobileLogin = async (req, res) => {
   }
 };
 
-// phone number verification
+// TODO: phone number verification
 exports.verifyPhone = async (req, res) => {
-  const u = req.user;
-  const { otp } = req.body;
-  const user = await validatePhoneOtp(u.id, otp);
-  if (!user) {
-    res.status(500).send("email verification failed");
-  }
-  res.status(200).send("user verification success");
+  // const u = req.user;
+  // const { otp } = req.body;
+  // const user = await validatePhoneOtp(u.id, otp);
+  // if (!user) {
+  //   res.status(500).send("email verification failed");
+  // }
+  res.status(200).send({ message: "user verification success" });
 };
 
 // password change - Can be used for both phone and email
@@ -130,6 +130,18 @@ exports.updatePassword = async (req, res) => {
     res.status(500).send("password update failure");
   }
   res.status(200).send("password change successful");
+};
+
+// TODO: forgot password
+exports.forgotPassword = async (req, res) => {
+  console.log("recieved");
+  res.status(200).send("Done");
+};
+
+// TODO: resend otp
+exports.resendOTP = async (req, res) => {
+  console.log("recieved");
+  res.status(200).send("Done");
 };
 
 // user profile -- can be used for both facility an normal user.

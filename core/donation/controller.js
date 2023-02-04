@@ -14,12 +14,13 @@ exports.myDonations = async (req, res) => {
 
 // I have donated
 exports.donated = async (req, res) => {
-  const { donor_number, facility } = req.body;
+  const { donor_number, facility, date } = req.body;
   const donation = await prisma.donation.create({
     data: {
       donorId: req.user.id,
       donorNumber: donor_number,
       facility: facility,
+      donationDate: date,
     },
   });
   if (!donation) {

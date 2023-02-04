@@ -30,19 +30,12 @@ exports.getFeeds = async (req, res) => {
 };
 // Share donation feed.
 exports.createFeed = async (req, res) => {
-  const { media, description, longitude, latitude } = req.body;
-
-  // if (media) {
-  //   const feed_url = uploadImage(media);
-  //   return;
-  // }
-
+  const { media, description } = req.body;
+  const feed_url = uploadImage(media);
   const donation = await prisma.feed.create({
     data: {
       information: description,
-      media: media,
-      latitude: latitude,
-      longitude: longitude,
+      media: feed_url,
       userId: req.user.id,
     },
   });

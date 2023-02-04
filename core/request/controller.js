@@ -29,12 +29,17 @@ exports.getRequest = async (req, res) => {
 
 // share emergency donation feed
 exports.createRequest = async (req, res) => {
-  const { bloodType, description } = req.body;
+  const { bloodGroup, requestType, when, needed, patientName, relationship } =
+    req.body;
   const broadcast = await prisma.request.create({
     data: {
       userId: req.user.id,
-      bloodType: bloodType,
-      description: description,
+      bloodGroup: bloodGroup,
+      requestType: requestType,
+      date: when,
+      bloodUnits: needed,
+      patientName: patientName,
+      relationship: relationship,
     },
   });
   if (!broadcast) {
