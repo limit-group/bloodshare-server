@@ -19,8 +19,12 @@ exports.feedsByMe = async (req, res) => {
 
 // fecth donation feed.
 exports.getFeeds = async (req, res) => {
-  // TODO: Filter by latest date.
-  const donations = await prisma.feed.findMany({ take: 10 });
+  const donations = await prisma.feed.findMany({
+    orderBy: {
+      id: "desc",
+    },
+    take: 10,
+  });
   if (!donations) {
     return res.status(500).send({
       message: "Failed to fetch donation feed.",

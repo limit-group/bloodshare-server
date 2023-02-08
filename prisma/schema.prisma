@@ -79,7 +79,7 @@ model Feed {
   id          Int      @id @default(autoincrement())
   user        User     @relation(fields: [userId], references: [id])
   userId      Int
-  media       String?
+  media       String?  @default("https://cdn.pixabay.com/photo/2015/04/20/21/42/blood-732298_960_720.jpg")
   information String   @db.VarChar(255)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

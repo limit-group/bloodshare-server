@@ -11,19 +11,22 @@ exports.requestByMe = async (req, res) => {
     res.status(200).send(broadcasts);
   } catch (error) {
     console.log(error);
-    res.status(500).send("something went wrong!");
+    res.status(500).send({ message: "Something went wrong!" });
   }
 };
 
 // List emergency feed
 exports.getRequest = async (req, res) => {
   try {
-    // TODO: Get latest
-    const broadcasts = await prisma.request.findMany({});
+    const broadcasts = await prisma.request.findMany({
+      orderBy: {
+        id: "desc",
+      },
+    });
     res.status(200).send(broadcasts);
   } catch (error) {
     console.log(error);
-    res.status(500).send("something went wrong!");
+    res.status(500).send({ message: "Something went wrong!" });
   }
 };
 
@@ -54,7 +57,7 @@ exports.createRequest = async (req, res) => {
   });
   if (!broadcast) {
     return res.status(500).send({
-      message: "Could not send blood request",
+      message: "Could not send blood request!",
     });
   }
 

@@ -2,6 +2,9 @@ const prisma = require("../../utils/db.utils");
 // my donations
 exports.myDonations = async (req, res) => {
   const my_donations = await prisma.donation.findMany({
+    orderBy: {
+      id: 'desc'
+    },
     where: {
       donorId: req.user.id,
     },
