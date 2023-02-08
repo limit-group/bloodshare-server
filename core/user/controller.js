@@ -134,9 +134,30 @@ exports.updatePassword = async (req, res) => {
 
 // TODO: forgot password
 exports.forgotPassword = async (req, res) => {
-  console.log("recieved");
-  
-  res.status(200).send("Done");
+  const otp = generateOTP();
+  const info = await sendSMS({
+    to: phone,
+    message: `Enter this code ${otp} to recover your account . Thank you.`,
+  });
+  if (!info) {
+    return res.status(500).send({ message: "Something went Wrong!" });
+  }
+  try {
+    await prisma.user.update({
+      where: {
+        phoneNumber: phone,
+      },
+      data: {
+        otp: otp,
+      },
+    });
+    res.status(200).send("Done");
+  } catch (err) {
+    console.log(err);
+    return res
+      .status(500)
+      .send({ message: "User with this phone number not found!" });
+  }
 };
 
 // TODO: resend otp
@@ -147,6 +168,7 @@ exports.resendOTP = async (req, res) => {
 
 // user profile -- can be used for both facility an normal user.
 exports.getUserProfile = async (req, res) => {
+  console.log("Get user profile \n");
   const user = req.user;
   const profile = await prisma.profile.findUnique({
     where: {
@@ -163,7 +185,7 @@ exports.getUserProfile = async (req, res) => {
 
 // works for -- normal user.
 exports.addUserProfile = async (req, res) => {
-console.log("Add user profile");
+  console.log("Add user profile");
   const user = req.user;
   const { name, dateOfBirth, bloodType, image, latitude, longitude } = req.body;
   const image_url = await uploadImage(image);
