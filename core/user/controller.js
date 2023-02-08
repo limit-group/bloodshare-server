@@ -105,12 +105,12 @@ exports.mobileLogin = async (req, res) => {
 
 // TODO: phone number verification
 exports.verifyPhone = async (req, res) => {
-  // const u = req.user;
-  // const { otp } = req.body;
-  // const user = await validatePhoneOtp(u.id, otp);
-  // if (!user) {
-  //   res.status(500).send("email verification failed");
-  // }
+  const u = req.user;
+  const { otp } = req.body;
+  const user = await validatePhoneOtp(u.id, otp);
+  if (!user) {
+    res.status(500).send("email verification failed");
+  }
   res.status(200).send({ message: "user verification success" });
 };
 
@@ -135,6 +135,7 @@ exports.updatePassword = async (req, res) => {
 // TODO: forgot password
 exports.forgotPassword = async (req, res) => {
   console.log("recieved");
+  
   res.status(200).send("Done");
 };
 
@@ -162,6 +163,7 @@ exports.getUserProfile = async (req, res) => {
 
 // works for -- normal user.
 exports.addUserProfile = async (req, res) => {
+console.log("Add user profile");
   const user = req.user;
   const { name, dateOfBirth, bloodType, image, latitude, longitude } = req.body;
   const image_url = await uploadImage(image);
@@ -176,8 +178,8 @@ exports.addUserProfile = async (req, res) => {
       dateOfBirth: dateOfBirth,
       bloodType: bloodType,
       avatar: image_url,
-      latitude: latitude,
-      longitude: longitude,
+      latitude: latitude.toString(),
+      longitude: longitude.toString(),
     },
   });
   if (!profile) {

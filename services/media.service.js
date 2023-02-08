@@ -4,6 +4,9 @@ const cloudinary = require("cloudinary").v2;
 // Return "https" URLs by setting secure: true
 cloudinary.config({
   secure: true,
+  cloud_name: "sokocrud3",
+  api_key: "829999173198241",
+  api_secret: "T4XOEfmKDRUyb-v6yYBgt52LLLw",
 });
 
 // Log the configuration
@@ -45,4 +48,4 @@ const getAssetInfo = async (publicId) => {
   }
 };
 
-module.exports = { getAssetInfo, uploadImage}
+module.exports = { getAssetInfo, uploadImage };

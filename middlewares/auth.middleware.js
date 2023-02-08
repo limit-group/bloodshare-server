@@ -20,17 +20,16 @@ const isAuth = (req, res, next) => {
   const { authorization } = req.headers;
   if (authorization) {
     const token = authorization.slice(7, authorization.length);
-    console.log(token);
     jwt.verify(token, process.env.JWT_SECRET, (err, decode) => {
       if (err) {
-        res.status(400).send({ message: "token provided not valid" });
+        res.status(400).send({ message: "Token provided not valid" });
       } else {
         req.user = decode;
         next();
       }
     });
   } else {
-    res.status(400).send("token is not supplied");
+    res.status(400).send("Token is not supplied");
   }
 };
 
