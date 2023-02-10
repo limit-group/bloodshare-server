@@ -1,3 +1,4 @@
+const { sendAlert } = require("../../services/message.service");
 const prisma = require("../../utils/db.utils");
 
 exports.requestByMe = async (req, res) => {
@@ -67,7 +68,6 @@ exports.createRequest = async (req, res) => {
 
 //when someone accept to donate
 exports.acceptBroadcast = async (req, res) => {
-  const user = req.user;
   const { accept, requestId } = req.body;
 
   if (checkAccepted(facility)) {
@@ -84,7 +84,16 @@ exports.acceptBroadcast = async (req, res) => {
     },
   });
 
+  //find user
+  const user = await prisma.user.findUnique({
+    where: {
+      userId: broadcast.userId
+    }
+  })
+
+
   // TODO: Send message with directions.
+  const info = await sendAlert({ })
 
   if (!broadcast) {
     return res.status(500).send({

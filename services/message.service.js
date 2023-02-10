@@ -31,7 +31,7 @@ module.exports.sendAlert = async (params) => {
     let alert = await africastalking.SMS.send({
       to: `${params.to}`,
       message: `Hi, ${params.name}, you have a blood donation request, 
-      from ${params.facility}. To accept to go donate reply with the word yes.`,
+      from ${params.user}. To accept to go donate reply with the word yes.`,
     }).then((res) => {
       console.log(res);
     });
