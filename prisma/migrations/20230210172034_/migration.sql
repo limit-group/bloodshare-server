@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Feed" ADD COLUMN     "going" INTEGER NOT NULL DEFAULT 0;

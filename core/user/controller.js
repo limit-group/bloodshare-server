@@ -169,18 +169,20 @@ exports.resendOTP = async (req, res) => {
 // user profile -- can be used for both facility an normal user.
 exports.getUserProfile = async (req, res) => {
   console.log("Get user profile \n");
-  const user = req.user;
+  console.log(req.user);
   const profile = await prisma.profile.findUnique({
     where: {
-      userId: user.id,
+      userId: 1,
     },
   });
+  console.log(profile);
   if (!profile) {
     return res.status(404).send({
-      message: "profile requested not found!",
+      message: "Profile requested not found!",
     });
   }
-  return res.status(200).send(profile);
+  
+  res.status(200).send(profile);
 };
 
 // works for -- normal user.

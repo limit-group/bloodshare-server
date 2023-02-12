@@ -31,6 +31,23 @@ exports.getRequest = async (req, res) => {
   }
 };
 
+// latest request
+exports.getLatestRequest = async (req, res) => {
+  console.log("hit here");
+  try {
+    const broadcasts = await prisma.request.findMany({
+      orderBy: {
+        id: "desc",
+      },
+      take: 1,
+    });
+    res.status(200).send(broadcasts);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: "Something went wrong!" });
+  }
+};
+
 // share emergency donation feed
 exports.createRequest = async (req, res) => {
   const {
@@ -87,13 +104,12 @@ exports.acceptBroadcast = async (req, res) => {
   //find user
   const user = await prisma.user.findUnique({
     where: {
-      userId: broadcast.userId
-    }
-  })
-
+      userId: broadcast.userId,
+    },
+  });
 
   // TODO: Send message with directions.
-  const info = await sendAlert({ })
+  const info = await sendAlert({});
 
   if (!broadcast) {
     return res.status(500).send({

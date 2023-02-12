@@ -81,6 +81,7 @@ model Feed {
   userId      Int
   media       String?  @default("https://cdn.pixabay.com/photo/2015/04/20/21/42/blood-732298_960_720.jpg")
   information String   @db.VarChar(255)
+  going       Int      @default(0)   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
