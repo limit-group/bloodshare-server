@@ -3,16 +3,16 @@ const prisma = require("../../utils/db.utils");
 exports.myDonations = async (req, res) => {
   const my_donations = await prisma.donation.findMany({
     orderBy: {
-      id: 'desc'
+      id: "desc",
     },
     where: {
       donorId: req.user.id,
     },
   });
   if (!my_donations) {
-    return res.status(404).send("You have not made any donations");
+    return res.status(404).send({ message: "You have not made any donations" });
   }
-  res.send(201).send("Donation Saved.");
+  res.send(201).send({ message: "Donation Saved." });
 };
 
 // I have donated
@@ -20,14 +20,14 @@ exports.donated = async (req, res) => {
   const { donor_number, facility, date } = req.body;
   const donation = await prisma.donation.create({
     data: {
-      donorId: req.user.id,
+      profileId: req.user.id,
       donorNumber: donor_number,
       facility: facility,
       donationDate: date,
     },
   });
   if (!donation) {
-    return res.status(500).send("Failed to record donation.");
+    return res.status(500).send({ message: "Failed to record donation." });
   }
 
   const profile = await prisma.profile.update({
@@ -35,12 +35,14 @@ exports.donated = async (req, res) => {
       userId: req.user.id,
     },
     data: {
-      bloodPoints: bloodPoints + 10,
+      bloodPoints: {
+        increment: 10,
+      },
     },
   });
 
   if (!profile) {
-    return res.status(500).send("Failed to record donation.");
+    return res.status(500).send({ message: "Failed to record donation." });
   }
-  res.send(201).send("Donation Saved.");
+  res.send(201).send({ message: "Donation Saved." });
 };

@@ -53,3 +53,22 @@ exports.createFeed = async (req, res) => {
     message: "Donation BroadCast Success.",
   });
 };
+
+// going button
+exports.attendDrive = async (req, res) => {
+  const feed = await prisma.feed.update({
+    where: {
+      id: req.params.feedID,
+    },
+    data: {
+      going: {
+        increment: 1,
+      },
+    },
+  });
+  if (!feed) {
+    return res.status(500).send({ message: "Error, Accepting drive!" });
+  }
+
+  res.status(200).send({ message: "Accepted to attend drive." });
+};
