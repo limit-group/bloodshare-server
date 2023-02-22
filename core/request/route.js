@@ -9,6 +9,7 @@ const { isAuth } = require("../../middlewares/auth.middleware");
 const router = express.Router();
 router.get("/requests", getRequest);
 router.post("/requests", isAuth, createRequest);
-router.post("/requests/latest", isAuth, getLatestRequest);
+router.get("/requests/latest", isAuth, getLatestRequest);
 router.post("/requests/me", isAuth, requestByMe);
+router.get("/requests/accept:/:requestId")
 module.exports = router;

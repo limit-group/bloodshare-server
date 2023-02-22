@@ -7,11 +7,11 @@ const africastalking = AfricasTalking({
 
 // TODO: Complete the AT messaging Service
 module.exports.sendSMS = async (params) => {
-  console.log(params)
   try {
     let info = await africastalking.SMS.send({
-      to: `${params.to}`,
+      to: [`${params.to}`],
       message: `${params.message}`,
+      enqueue: true,
     })
       .then((res) => {
         console.log("Messaging Response.......", res);
@@ -29,7 +29,7 @@ module.exports.sendSMS = async (params) => {
 module.exports.sendAlert = async (params) => {
   try {
     let alert = await africastalking.SMS.send({
-      to: `${params.to}`,
+      to: [`${params.to}`],
       message: `Hi, ${params.name}, you have a blood donation request, 
       from ${params.user}. To accept to go donate reply with the word yes.`,
     }).then((res) => {
@@ -45,7 +45,7 @@ module.exports.sendAlert = async (params) => {
 module.exports.confirmAcceptance = async (params) => {
   try {
     let confirm = await africastalking.SMS.send({
-      to: `${params.to}`,
+      to: [`${params.to}`],
       message: `Thank you for accepting the donation request, you have been queued as a donor
       at ${params.facility}. Move swiftly to save a life.`,
     }).then((res) => {

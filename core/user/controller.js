@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const { jwtSign } = require("../../middlewares/auth.middleware");
 const { generateOTP } = require("../../services/otp.service");
 const { sendSMS } = require("../../services/message.service");
+const { uploadImage } = require("../../services/media.service");
 
 // EPI
 exports.endpoint = (req, res) => {
@@ -20,10 +21,10 @@ const validatePhoneOtp = async (id, otp) => {
     },
   });
   if (!user) {
-    return [false, "user doesn't exist"];
+    return [false, "User doesn't exist"];
   }
   if (user && user.otp !== otp) {
-    return [false, "invalid otp provided"];
+    return [false, "Invalid otp provided"];
   }
   const newUser = await prisma.user.update({
     where: {
@@ -91,7 +92,7 @@ exports.mobileLogin = async (req, res) => {
   if (!user) {
     return res
       .status(400)
-      .json({ message: "user with this phone number doesn't exist" });
+      .json({ message: "user with this mobile doesn't exist" });
   }
   if (user && bcrypt.compareSync(password, user.password)) {
     return res.status(200).send({
@@ -136,11 +137,12 @@ exports.updatePassword = async (req, res) => {
 exports.forgotPassword = async (req, res) => {
   const otp = generateOTP();
   const info = await sendSMS({
-    to: phone,
-    message: `Enter this code ${otp} to recover your account . Thank you.`,
+    to: req.body.phone,
+    message: `Enter this code ${otp} to recover your account .Thank you.`,
   });
+  console.log(info)
   if (!info) {
-    return res.status(500).send({ message: "Something went Wrong!" });
+    return res.status(500).send({ message: "Failed to send OTP!" });
   }
   try {
     await prisma.user.update({
@@ -175,69 +177,62 @@ exports.getUserProfile = async (req, res) => {
       userId: 1,
     },
   });
-  console.log(profile);
+  // console.log(profile);
   if (!profile) {
     return res.status(404).send({
       message: "Profile requested not found!",
     });
   }
-  
+
   res.status(200).send(profile);
 };
 
 // works for -- normal user.
 exports.addUserProfile = async (req, res) => {
-  console.log("Add user profile");
-  const user = req.user;
-  const { name, dateOfBirth, bloodType, image, latitude, longitude } = req.body;
+  const { fullName, dob, bloodType, image, latitude, longitude, email , gender} =
+    req.body;
   const image_url = await uploadImage(image);
   if (!image_url) {
-    return res.status(500).send("Retry the image upload.");
+    return res.status(500).send({ message: "failed to upload your avatar." });
   }
-
   const profile = await prisma.profile.create({
     data: {
-      userId: user.id,
-      name: name,
-      dateOfBirth: dateOfBirth,
+      userId: req.user.id,
+      name: fullName,
+      dateOfBirth: dob,
       bloodType: bloodType,
+      gender: gender,
       avatar: image_url,
-      latitude: latitude.toString(),
-      longitude: longitude.toString(),
+      email: email,
+      // latitude: latitude.toString(),
+      // longitude: longitude.toString(),
     },
   });
   if (!profile) {
     return res.status(500).send({
       message: "user profile creation failure",
-      error: error,
-    });
-  } else {
-    return res.status(201).send({
-      message: "profile created Success",
-      profile: profile,
     });
   }
+
+  return res.status(201).send({
+    message: "profile created Success",
+  });
 };
 
 // works -- can be updated.
 exports.updateUserProfile = async (req, res) => {
-  const user = req.user;
-  const { name, dateOfBirth, bloodType, avatar, latitude, longitude } =
+  const { fullName, dob, bloodType, image, latitude, longitude, email } =
     req.body;
-  const newAvatar = uploadImage(avatar);
-  if (!newAvatar) {
-    return res.status(500).send({
-      message: "Profile Image is Important",
-    });
-  }
-  const profile = await prisma.userProfile.update({
+  const image_url = uploadImage(image);
+  const profile = await prisma.profile.update({
     where: {
-      userId: user.id,
+      userId: req.user.id,
     },
     data: {
-      name: name,
-      avatar: newAvatar,
-      dateOfBirth: dateOfBirth,
+      name: fullName,
+      avatar: image_url,
+      dateOfBirth: dob,
+      email: email,
       bloodType: bloodType,
       latitude: latitude,
       longitude: longitude,
@@ -246,7 +241,6 @@ exports.updateUserProfile = async (req, res) => {
   if (!profile) {
     return res.status(500).send({
       message: "user profile failure",
-      error: error,
     });
   } else {
     return res.status(200).send(profile);

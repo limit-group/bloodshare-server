@@ -24,6 +24,12 @@ enum Req {
   OTHERS
 }
 
+enum Gender {
+  MALE
+  FEMALE
+  NON_BINARY
+}
+
 enum BloodType {
   A_POSITIVE
   A_NEGATIVE
@@ -54,12 +60,14 @@ model Profile {
   user        User      @relation(fields: [userId], references: [id])
   userId      Int       @unique
   name        String    @db.VarChar(255)
-  avatar      String
+  email       String?   @db.VarChar(255)
+  gender      Gender
+  avatar      String    @default("https://i.postimg.cc/zBDxKxMp/avatar.png")
   dateOfBirth DateTime
   bloodType   BloodType @unique
-  latitude    String
-  longitude   String
-  
+  bodyWeight  String?
+  latitude    String?
+  longitude   String?
   bloodPoints Int       @default(0)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -68,7 +76,7 @@ model Profile {
 model Donation {
   id           Int      @id @default(autoincrement())
   profile      User     @relation(fields: [profileId], references: [id])
-  profileId      Int     
+  profileId    Int
   donorNumber  String
   facility     String
   donationDate DateTime @default(now())
@@ -82,7 +90,7 @@ model Feed {
   userId      Int
   media       String?  @default("https://cdn.pixabay.com/photo/2015/04/20/21/42/blood-732298_960_720.jpg")
   information String   @db.VarChar(255)
-  going       Int      @default(0)   
+  going       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

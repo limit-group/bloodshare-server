@@ -35,13 +35,21 @@ exports.getRequest = async (req, res) => {
 exports.getLatestRequest = async (req, res) => {
   console.log("hit here");
   try {
+    const donations_count = await prisma.donation.count();
+    const request_count = await prisma.request.count();
     const broadcasts = await prisma.request.findMany({
       orderBy: {
         id: "desc",
       },
       take: 1,
     });
-    res.status(200).send(broadcasts);
+    res
+      .status(200)
+      .send({
+        broadcasts: broadcasts,
+        request_count: request_count,
+        donations_count: donations_count,
+      });
   } catch (error) {
     console.log(error);
     res.status(500).send({ message: "Something went wrong!" });
@@ -85,7 +93,6 @@ exports.createRequest = async (req, res) => {
 
 //when someone accept to donate
 exports.acceptBroadcast = async (req, res) => {
-  const { accept, requestId } = req.body;
 
   if (checkAccepted(facility)) {
     return res.status(200).send({
@@ -94,10 +101,12 @@ exports.acceptBroadcast = async (req, res) => {
   }
   const broadcast = await prisma.request.update({
     where: {
-      id: requestId,
+      id: req.params.request,
     },
     data: {
-      accept: accept + 1,
+      accept: {
+        increment: 1
+      }
     },
   });
 
