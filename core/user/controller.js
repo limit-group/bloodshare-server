@@ -170,8 +170,6 @@ exports.resendOTP = async (req, res) => {
 
 // user profile -- can be used for both facility an normal user.
 exports.getUserProfile = async (req, res) => {
-  console.log("Get user profile \n");
-  console.log(req.user);
   const profile = await prisma.profile.findUnique({
     where: {
       userId: 1,
@@ -221,8 +219,7 @@ exports.addUserProfile = async (req, res) => {
 
 // works -- can be updated.
 exports.updateUserProfile = async (req, res) => {
-  const { fullName, dob, bloodType, image, latitude, longitude, email } =
-    req.body;
+  const { fullName, image, email } = req.body;
   const image_url = uploadImage(image);
   const profile = await prisma.profile.update({
     where: {
@@ -231,11 +228,7 @@ exports.updateUserProfile = async (req, res) => {
     data: {
       name: fullName,
       avatar: image_url,
-      dateOfBirth: dob,
       email: email,
-      bloodType: bloodType,
-      latitude: latitude,
-      longitude: longitude,
     },
   });
   if (!profile) {

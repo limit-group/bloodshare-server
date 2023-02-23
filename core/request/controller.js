@@ -43,13 +43,11 @@ exports.getLatestRequest = async (req, res) => {
       },
       take: 1,
     });
-    res
-      .status(200)
-      .send({
-        broadcasts: broadcasts,
-        request_count: request_count,
-        donations_count: donations_count,
-      });
+    res.status(200).send({
+      broadcasts: broadcasts,
+      request_count: request_count,
+      donations_count: donations_count,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).send({ message: "Something went wrong!" });
@@ -88,57 +86,56 @@ exports.createRequest = async (req, res) => {
   }
 
   // TODO: query users to send the request alerts
+  // const users =
   res.status(201).send("Shared Successfully");
 };
 
 //when someone accept to donate
 exports.acceptBroadcast = async (req, res) => {
-
-  if (checkAccepted(facility)) {
+  if (checkAccepted(req.params.requestId)) {
     return res.status(200).send({
-      message: "people have already accepted to donate,.",
+      message: "people have already accepted to donate.",
     });
   }
-  const broadcast = await prisma.request.update({
-    where: {
-      id: req.params.request,
-    },
-    data: {
-      accept: {
-        increment: 1
-      }
-    },
-  });
+  try {
+    const request = await prisma.request.update({
+      where: {
+        id: req.params.requestId,
+      },
+      data: {
+        accept: {
+          increment: 1,
+        },
+      },
+    });
 
-  //find user
-  const user = await prisma.user.findUnique({
-    where: {
-      userId: broadcast.userId,
-    },
-  });
+    //find user
+    const user = await prisma.user.findUnique({
+      where: {
+        userId: request.userId,
+      },
+    });
 
-  // TODO: Send message with directions.
-  const info = await sendAlert({});
-
-  if (!broadcast) {
+    // TODO: Send message with directions.
+    const info = await sendAlert({});
+    res.status(200).send({
+      message: "Thank for accepting to save lives.",
+    });
+  } catch (error) {
     return res.status(500).send({
       message: "Could not complete request.",
     });
   }
-
-  res.status(200).send({
-    message: "Thank for accepting to save lives.",
-  });
 };
 
-async function checkAccepted(facilityId) {
+async function checkAccepted(reqId) {
   const acceptCount = 3;
-  const facility = await prisma.request.findUnique({
+  const request = await prisma.request.findUnique({
     where: {
-      id: facilityId,
+      id: reqId,
     },
   });
-  if (facility.accept == acceptCount) {
+  if (request.accept == acceptCount) {
     return true;
   }
   return false;

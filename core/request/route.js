@@ -4,12 +4,13 @@ const {
   getRequest,
   requestByMe,
   getLatestRequest,
+  acceptBroadcast,
 } = require("./controller");
 const { isAuth } = require("../../middlewares/auth.middleware");
 const router = express.Router();
-router.get("/requests", getRequest);
+router.get("/requests", isAuth, getRequest);
 router.post("/requests", isAuth, createRequest);
 router.get("/requests/latest", isAuth, getLatestRequest);
 router.post("/requests/me", isAuth, requestByMe);
-router.get("/requests/accept:/:requestId")
+router.get("/requests/accept:/:requestId", acceptBroadcast)
 module.exports = router;

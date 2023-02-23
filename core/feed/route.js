@@ -1,9 +1,14 @@
 const express = require("express");
 const { isAuth } = require("../../middlewares/auth.middleware");
-const { getFeeds, createFeed, feedsByMe, attendDrive } = require("./controller");
+const {
+  getFeeds,
+  createFeed,
+  feedsByMe,
+  attendDrive,
+} = require("./controller");
 const router = express.Router();
-router.get("/feeds", getFeeds);
+router.get("/feeds", isAuth, getFeeds);
 router.post("/feeds", isAuth, createFeed);
-router.get("/feeds/me", isAuth, feedsByMe)
-router.get("/feeds/going/:feedID", attendDrive)
+router.get("/feeds/me", isAuth, feedsByMe);
+router.get("/feeds/going/:feedID", attendDrive);
 module.exports = router;
