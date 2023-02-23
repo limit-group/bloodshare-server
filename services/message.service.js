@@ -30,8 +30,7 @@ module.exports.sendAlert = async (params) => {
   try {
     let alert = await africastalking.SMS.send({
       to: [`${params.to}`],
-      message: `Hi, ${params.name}, you have a blood donation request, 
-      from ${params.user}. To accept to go donate reply with the word yes.`,
+      message: `Hi, ${params.name}, you have a blood donation request. To accept to go donate reply with the word yes.`,
     }).then((res) => {
       console.log(res);
     });
@@ -47,7 +46,7 @@ module.exports.confirmAcceptance = async (params) => {
     let confirm = await africastalking.SMS.send({
       to: [`${params.to}`],
       message: `Thank you for accepting the donation request, you have been queued as a donor
-      at ${params.facility}. Move swiftly to save a life.`,
+      at https://www.google.com/maps/search/?api=1&query=${params.latitude}%2C${params.longitude}. Move swiftly to save a life.`,
     }).then((res) => {
       console.log(res);
     });

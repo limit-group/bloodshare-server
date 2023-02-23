@@ -140,7 +140,7 @@ exports.forgotPassword = async (req, res) => {
     to: req.body.phone,
     message: `Enter this code ${otp} to recover your account .Thank you.`,
   });
-  console.log(info)
+  console.log(info);
   if (!info) {
     return res.status(500).send({ message: "Failed to send OTP!" });
   }
@@ -187,8 +187,16 @@ exports.getUserProfile = async (req, res) => {
 
 // works for -- normal user.
 exports.addUserProfile = async (req, res) => {
-  const { fullName, dob, bloodType, image, latitude, longitude, email , gender} =
-    req.body;
+  const {
+    fullName,
+    dob,
+    bloodType,
+    image,
+    latitude,
+    longitude,
+    email,
+    gender,
+  } = req.body;
   const image_url = await uploadImage(image);
   if (!image_url) {
     return res.status(500).send({ message: "failed to upload your avatar." });

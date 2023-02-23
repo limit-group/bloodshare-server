@@ -1,4 +1,7 @@
-const { sendAlert } = require("../../services/message.service");
+const {
+  sendAlert,
+  confirmAcceptance,
+} = require("../../services/message.service");
 const prisma = require("../../utils/db.utils");
 
 exports.requestByMe = async (req, res) => {
@@ -86,7 +89,16 @@ exports.createRequest = async (req, res) => {
   }
 
   // TODO: query users to send the request alerts
-  // const users =
+  const profile = await prisma.profile.findMany({
+    take: 10,
+    where: {},
+    select: {
+      user: {
+        phoneNumber: true,
+      },
+    },
+  });
+  // const info = await sendAlert({ to: user.phoneNumber, name: req.user.name, });
   res.status(201).send("Shared Successfully");
 };
 
@@ -116,11 +128,18 @@ exports.acceptBroadcast = async (req, res) => {
       },
     });
 
-    // TODO: Send message with directions.
-    const info = await sendAlert({});
-    res.status(200).send({
-      message: "Thank for accepting to save lives.",
+    // Send message with directions.
+    const info = confirmAcceptance({
+      to: user.phoneNumber,
+      latitude: request.latitude,
+      longitude: request.longitude,
     });
+
+    if (info) {
+      res.status(200).send({
+        message: "Thank for accepting to save lives.",
+      });
+    }
   } catch (error) {
     return res.status(500).send({
       message: "Could not complete request.",

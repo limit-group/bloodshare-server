@@ -11,6 +11,7 @@ const {
   forgotPassword,
   endpoint,
   resendOTP,
+  getp,
 } = require("./controller");
 const router = express.Router();
 router.get("", endpoint);

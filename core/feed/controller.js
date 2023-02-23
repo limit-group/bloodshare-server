@@ -56,19 +56,21 @@ exports.createFeed = async (req, res) => {
 
 // going button
 exports.attendDrive = async (req, res) => {
-  const feed = await prisma.feed.update({
-    where: {
-      id: req.params.feedID,
-    },
-    data: {
-      going: {
-        increment: 1,
+  try {
+    const feed = await prisma.feed.update({
+      where: {
+        id: parseInt(req.params.feedID),
       },
-    },
-  });
-  if (!feed) {
+      data: {
+        going: {
+          increment: 1,
+        },
+      },
+    });
+    if (feed) {
+      res.status(200).send({ message: "Accepted to attend drive." });
+    }
+  } catch (err) {
     return res.status(500).send({ message: "Error, Accepting drive!" });
   }
-
-  res.status(200).send({ message: "Accepted to attend drive." });
 };

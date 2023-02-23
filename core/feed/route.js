@@ -10,5 +10,5 @@ const router = express.Router();
 router.get("/feeds", isAuth, getFeeds);
 router.post("/feeds", isAuth, createFeed);
 router.get("/feeds/me", isAuth, feedsByMe);
-router.get("/feeds/going/:feedID", attendDrive);
+router.get("/feeds/going/:feedID", isAuth, attendDrive);
 module.exports = router;
