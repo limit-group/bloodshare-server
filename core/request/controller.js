@@ -36,7 +36,6 @@ exports.getRequest = async (req, res) => {
 
 // latest request
 exports.getLatestRequest = async (req, res) => {
-  console.log("hit here");
   try {
     const donations_count = await prisma.donation.count();
     const request_count = await prisma.request.count();
@@ -59,47 +58,68 @@ exports.getLatestRequest = async (req, res) => {
 
 // share emergency donation feed
 exports.createRequest = async (req, res) => {
-  const {
+  let {
     bloodGroup,
     requestType,
     when,
     needed,
     patientName,
     relationship,
+    diagnosis,
+    biography,
     latitude,
     longitude,
   } = req.body;
-  const broadcast = await prisma.request.create({
-    data: {
-      userId: req.user.id,
-      bloodGroup: bloodGroup,
-      requestType: requestType,
-      date: when,
-      latitude: latitude.toString(),
-      longitude: longitude.toString(),
-      bloodUnits: needed,
-      patientName: patientName,
-      relationship: relationship,
-    },
-  });
-  if (!broadcast) {
-    return res.status(500).send({
-      message: "Could not send blood request!",
-    });
-  }
 
-  // TODO: query users to send the request alerts
-  const profile = await prisma.profile.findMany({
-    take: 10,
-    where: {},
-    select: {
-      user: {
-        phoneNumber: true,
+  if (requestType == "SELF") {
+    // find user
+    let profile = await prisma.profile.findUnique({
+      where: {
+        userId: req.user.id
+      }
+    })
+    let patientName = profile.name
+    return patientName
+  }
+  
+  try {
+    const broadcast = await prisma.request.create({
+      data: {
+        userId: req.user.id,
+        bloodGroup: bloodGroup,
+        requestType: requestType,
+        date: when,
+        diagnosis: diagnosis,
+        biography: biography,
+        latitude: latitude.toString(),
+        longitude: longitude.toString(),
+        bloodUnits: needed,
+        patientName: patientName,
+        relationship: relationship,
       },
-    },
-  });
-  // const info = await sendAlert({ to: user.phoneNumber, name: req.user.name, });
-  res.status(201).send("Shared Successfully");
+    });
+    if (!broadcast) {
+      return res.status(500).send({
+        message: "Could not send blood request!",
+      });
+    }
+
+    // TODO: query users to send the request alerts
+    const profile = await prisma.profile.findMany({
+      take: 10,
+      where: {},
+      select: {
+        user: {
+          phoneNumber: true,
+        },
+      },
+    });
+    // const info = await sendAlert({ to: user.phoneNumber, name: req.user.name, });
+    res.status(201).send("Shared Successfully");
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ message: "failed to create request" });
+  }
 };
 
 //when someone accept to donate

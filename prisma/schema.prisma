@@ -102,11 +102,13 @@ model Request {
   requestType  Req       @default(OTHERS)
   date         DateTime  @default(now())
   bloodGroup   BloodType
+  diagnosis    String?   @db.VarChar(255)
   latitude     String
   longitude    String
   bloodUnits   Int       @default(0)
   patientName  String    @db.VarChar(255)
   relationship String    @db.VarChar(255)
+  biography    String?   @db.VarChar(255)
   accept       Int       @default(0)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
