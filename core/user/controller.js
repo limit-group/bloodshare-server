@@ -67,7 +67,9 @@ exports.mobileSignup = async (req, res) => {
     },
   });
   if (!new_user) {
-    return res.status(500).send("Unable to signup, please try again later!");
+    return res
+      .status(500)
+      .send({ message: "Unable to signup, please try again later!" });
   }
   // send otp message.
   const info = await sendSMS({
@@ -75,9 +77,9 @@ exports.mobileSignup = async (req, res) => {
     message: `Enter this code ${otp} to verify your account . Thank you.`,
   });
 
-  if (!info) {
-    return res.status(500).send("Unable to signup, please try again later!");
-  }
+  // if (!info) {
+  //   return res.status(500).send("Unable to signup, please try again later!");
+  // }
   res.status(200).send(user);
 };
 
@@ -100,7 +102,7 @@ exports.mobileLogin = async (req, res) => {
       message: "authentication success",
     });
   } else {
-    return res.status(401).send("Wrong Password provided.");
+    return res.status(401).send({ message: "Wrong Password provided." });
   }
 };
 
@@ -110,9 +112,9 @@ exports.verifyPhone = async (req, res) => {
   const { otp } = req.body;
   const user = await validatePhoneOtp(u.id, otp);
   if (!user) {
-    res.status(500).send("email verification failed");
+    res.status(500).send({ message: "Phone verification failed!" });
   }
-  res.status(200).send({ message: "user verification success" });
+  res.status(200).send({ message: "User verification success" });
 };
 
 // password change - Can be used for both phone and email
@@ -128,32 +130,20 @@ exports.updatePassword = async (req, res) => {
   });
 
   if (!user) {
-    res.status(500).send("password update failure");
+    res.status(500).send({ message: "password update failure" });
   }
-  res.status(200).send("password change successful");
+  res.status(200).send({ message: "password change successful" });
 };
 
 // TODO: forgot password
 exports.forgotPassword = async (req, res) => {
-  const otp = generateOTP();
-  const info = await sendSMS({
-    to: req.body.phone,
-    message: `Enter this code ${otp} to recover your account .Thank you.`,
-  });
-  console.log(info);
-  if (!info) {
-    return res.status(500).send({ message: "Failed to send OTP!" });
-  }
   try {
-    await prisma.user.update({
+    await prisma.user.findUnique({
       where: {
-        phoneNumber: phone,
-      },
-      data: {
-        otp: otp,
+        phoneNumber: req.body.phone,
       },
     });
-    res.status(200).send("Done");
+    res.status(200).send({ message: "User Found." });
   } catch (err) {
     console.log(err);
     return res
@@ -164,8 +154,31 @@ exports.forgotPassword = async (req, res) => {
 
 // TODO: resend otp
 exports.resendOTP = async (req, res) => {
-  console.log("recieved");
-  res.status(200).send("Done");
+  const otp = generateOTP();
+  const info = await sendSMS({
+    to: req.body.phone,
+    message: `Enter this code ${otp} to recover your account .Thank you.`,
+  });
+  console.log(info);
+  // if (!info) {
+  //   return res.status(500).send({ message: "Failed to send OTP!" });
+  // }
+  try {
+    await prisma.user.update({
+      where: {
+        phoneNumber: phone,
+      },
+      data: {
+        otp: otp,
+      },
+    });
+    res.status(200).send({ message: "Check SMS for OTP code." });
+  } catch (err) {
+    console.log(err);
+    return res
+      .status(500)
+      .send({ message: "User with this phone number not found!" });
+  }
 };
 
 // user profile -- can be used for both facility an normal user.

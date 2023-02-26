@@ -11,6 +11,6 @@ const router = express.Router();
 router.get("/requests", isAuth, getRequest);
 router.post("/requests", isAuth, createRequest);
 router.get("/requests/latest", isAuth, getLatestRequest);
-router.post("/requests/me", isAuth, requestByMe);
+router.get("/requests/me", isAuth, requestByMe);
 router.get("/requests/accept:/:requestId", acceptBroadcast)
 module.exports = router;

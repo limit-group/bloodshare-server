@@ -8,18 +8,21 @@ const africastalking = AfricasTalking({
 // TODO: Complete the AT messaging Service
 module.exports.sendSMS = async (params) => {
   try {
-    let info = await africastalking.SMS.send({
+    await africastalking.SMS.send({
       to: [`${params.to}`],
       message: `${params.message}`,
       enqueue: true,
+      from: `blood-share`,
     })
       .then((res) => {
-        console.log("Messaging Response.......", res);
+        if (res.SMSMessageData["Recipients"][0]["status"] == "success") {
+          return true;
+        }
+        console.log(res.SMSMessageData["Recipients"]);
       })
       .catch((err) => {
         console.log(err);
       });
-    return info;
   } catch (err) {
     console.log(err);
     return false;
@@ -27,14 +30,20 @@ module.exports.sendSMS = async (params) => {
 };
 
 module.exports.sendAlert = async (params) => {
+  console.log(params.to);
   try {
-    let alert = await africastalking.SMS.send({
-      to: [`${params.to}`],
-      message: `Hi, ${params.name}, you have a blood donation request. To accept to go donate reply with the word yes.`,
+    await africastalking.SMS.send({
+      // to: `${params.to}`,
+      to: "+254759701314",
+      enqueue: true,
+      message: `Hi, you have a blood donation request. To accept to go donate reply with the word yes.`,
+      from: `blood-share`,
     }).then((res) => {
-      console.log(res);
+      if (res.SMSMessageData["Recipients"][0]["status"] == "success") {
+        return true;
+      }
+      console.log(res.SMSMessageData["Recipients"]);
     });
-    return alert;
   } catch (err) {
     console.log(err);
     return false;
@@ -43,14 +52,17 @@ module.exports.sendAlert = async (params) => {
 
 module.exports.confirmAcceptance = async (params) => {
   try {
-    let confirm = await africastalking.SMS.send({
+    await africastalking.SMS.send({
       to: [`${params.to}`],
       message: `Thank you for accepting the donation request, you have been queued as a donor
       at https://www.google.com/maps/search/?api=1&query=${params.latitude}%2C${params.longitude}. Move swiftly to save a life.`,
+      from: `blood-share`,
     }).then((res) => {
-      console.log(res);
+      if (res.SMSMessageData["Recipients"][0]["status"] == "success") {
+        return true;
+      }
+      console.log(res.SMSMessageData["Recipients"]);
     });
-    return confirm;
   } catch (err) {
     console.log(err);
     return false;

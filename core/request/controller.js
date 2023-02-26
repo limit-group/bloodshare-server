@@ -6,10 +6,12 @@ const prisma = require("../../utils/db.utils");
 
 exports.requestByMe = async (req, res) => {
   try {
-    // TODO: Get latest
     const broadcasts = await prisma.request.findMany({
       where: {
         userId: req.user.id,
+      },
+      orderBy: {
+        id: "desc",
       },
     });
     res.status(200).send(broadcasts);
@@ -75,14 +77,43 @@ exports.createRequest = async (req, res) => {
     // find user
     let profile = await prisma.profile.findUnique({
       where: {
-        userId: req.user.id
-      }
-    })
-    let patientName = profile.name
-    return patientName
+        userId: req.user.id,
+      },
+    });
+    let patientName = profile.name;
+    return patientName;
   }
-  
   try {
+    // query users to send the request alerts
+    const profiles = await prisma.profile.findMany({
+      where: {
+        bloodType: bloodGroup,
+      },
+      select: {
+        user: {
+          select: {
+            phoneNumber: true,
+          },
+        },
+      },
+    });
+    if (!profiles) {
+      return res.status(500).send({
+        message: "Could not send blood request!",
+      });
+    }
+    let recipients = [];
+    profiles.map((prof) => {
+      recipients.push(prof["user"]["phoneNumber"]);
+    });
+    //send the alert messages.
+    if (profiles.length > 0) {
+      const info = await sendAlert({ to: recipients, name: req.user.name });
+      if (info) {
+        console.log("sms sent.");
+      }
+    }
+
     const broadcast = await prisma.request.create({
       data: {
         userId: req.user.id,
@@ -104,17 +135,6 @@ exports.createRequest = async (req, res) => {
       });
     }
 
-    // TODO: query users to send the request alerts
-    const profile = await prisma.profile.findMany({
-      take: 10,
-      where: {},
-      select: {
-        user: {
-          phoneNumber: true,
-        },
-      },
-    });
-    // const info = await sendAlert({ to: user.phoneNumber, name: req.user.name, });
     res.status(201).send("Shared Successfully");
   } catch (err) {
     console.log(err);
@@ -145,7 +165,7 @@ exports.acceptBroadcast = async (req, res) => {
     const user = await prisma.user.findUnique({
       where: {
         userId: request.userId,
-      },
+      }
     });
 
     // Send message with directions.
