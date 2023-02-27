@@ -261,6 +261,55 @@ exports.updateUserProfile = async (req, res) => {
   }
 };
 
+// get all users
+exports.getUsers = async (req, res) => {
+  try {
+    const users = await prisma.user.findMany({});
+    res.status(200).send(users);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("failed to get users");
+  }
+};
+
+exports.createUser = async (req, res) => {
+  const { phone, role, password } = req.body;
+  const user = await prisma.user.findUnique({
+    where: {
+      phoneNumber: phone,
+    },
+  });
+  if (user) {
+    return res.send("user with this phone number exists");
+  } else {
+    encrypted = generatePassword(password);
+    const user = new prisma.user.create({
+      data: {
+        phoneNumber: phone,
+        password: encrypted,
+        role: role,
+      },
+    });
+
+    if (!user) {
+      return res.status(500).send({
+        message: "unable to create user, please try again later",
+      });
+    } else {
+      try {
+        res.status(200).send({
+          message: "user account creation success",
+        });
+      } catch (error) {
+        console.log(error);
+        res.status(500).send({
+          message: "unable to create account, please try again later",
+        });
+      }
+    }
+  }
+};
+
 // // user signup by email -only for facility
 // exports.signup = async (req, res) => {
 //   const { email, password, name } = req.body;

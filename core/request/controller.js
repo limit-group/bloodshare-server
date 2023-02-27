@@ -83,6 +83,7 @@ exports.createRequest = async (req, res) => {
     let patientName = profile.name;
     return patientName;
   }
+  console.log(patientName);
   try {
     // query users to send the request alerts
     const profiles = await prisma.profile.findMany({
@@ -111,9 +112,11 @@ exports.createRequest = async (req, res) => {
       const info = await sendAlert({ to: recipients, name: req.user.name });
       if (info) {
         console.log("sms sent.");
+      } else {
+        console.log("sending sms failed.");
       }
     }
-
+    //create broadcast
     const broadcast = await prisma.request.create({
       data: {
         userId: req.user.id,
@@ -165,7 +168,7 @@ exports.acceptBroadcast = async (req, res) => {
     const user = await prisma.user.findUnique({
       where: {
         userId: request.userId,
-      }
+      },
     });
 
     // Send message with directions.
