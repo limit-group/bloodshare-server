@@ -149,7 +149,7 @@ exports.createRequest = async (req, res) => {
 exports.acceptBroadcast = async (req, res) => {
   if (checkAccepted(req.params.requestId)) {
     return res.status(200).send({
-      message: "people have already accepted to donate.",
+      message: "enough people have already accepted to donate.",
     });
   }
   try {
@@ -179,10 +179,11 @@ exports.acceptBroadcast = async (req, res) => {
     });
 
     if (info) {
-      res.status(200).send({
-        message: "Thank for accepting to save lives.",
-      });
+      console.log(info);
     }
+    res.status(200).send({
+      message: "Thank for accepting to save lives.",
+    });
   } catch (error) {
     return res.status(500).send({
       message: "Could not complete request.",
@@ -194,7 +195,7 @@ async function checkAccepted(reqId) {
   const acceptCount = 3;
   const request = await prisma.request.findUnique({
     where: {
-      id: reqId,
+      id: parseInt(reqId),
     },
   });
   if (request.accept == acceptCount) {
