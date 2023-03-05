@@ -80,7 +80,7 @@ exports.mobileSignup = async (req, res) => {
   // if (!info) {
   //   return res.status(500).send("Unable to signup, please try again later!");
   // }
-  res.status(200).send(user);
+  res.status(200).send(jwtSign(user));
 };
 
 // user login works
@@ -106,7 +106,6 @@ exports.mobileLogin = async (req, res) => {
   }
 };
 
-// TODO: phone number verification
 exports.verifyPhone = async (req, res) => {
   const u = req.user;
   const { otp } = req.body;

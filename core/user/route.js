@@ -18,7 +18,7 @@ const router = express.Router();
 router.get("", endpoint);
 router.post("/login", mobileLogin);
 router.post("/signup", mobileSignup);
-router.post("/verify", verifyPhone);
+router.post("/verify", isAuth, verifyPhone);
 router.post("/forgot", forgotPassword);
 router.post("/resend", resendOTP);
 router.get("/users", isAuth, getUsers);
