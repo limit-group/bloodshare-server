@@ -9,7 +9,8 @@ const africastalking = AfricasTalking({
 module.exports.sendSMS = async (params) => {
   try {
     await africastalking.SMS.send({
-      to: [`${params.to}`],
+      // to: [`${params.to}`],
+      to: ['+254783263352'],
       message: `${params.message}`,
       enqueue: true,
       from: `blood-share`,

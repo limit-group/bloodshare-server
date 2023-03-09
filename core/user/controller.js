@@ -45,7 +45,7 @@ const generatePassword = (password) => {
 
 // user signup by mobile number
 exports.mobileSignup = async (req, res) => {
-  const { password, phone } = req.body;
+  const { password, phone, role } = req.body;
   const otp = generateOTP();
   // check if account exists
   const user = await prisma.user.findUnique({
@@ -64,6 +64,7 @@ exports.mobileSignup = async (req, res) => {
       phoneNumber: phone,
       password: generatePassword(password),
       otp: otp,
+      role: role,
     },
   });
   if (!new_user) {
@@ -80,7 +81,7 @@ exports.mobileSignup = async (req, res) => {
   // if (!info) {
   //   return res.status(500).send("Unable to signup, please try again later!");
   // }
-  res.status(200).send(jwtSign(user));
+  res.status(200).send(jwtSign(new_user));
 };
 
 // user login works
@@ -99,6 +100,7 @@ exports.mobileLogin = async (req, res) => {
   if (user && bcrypt.compareSync(password, user.password)) {
     return res.status(200).send({
       token: jwtSign(user),
+      role: user.role,
       message: "authentication success",
     });
   } else {
@@ -309,170 +311,42 @@ exports.createUser = async (req, res) => {
   }
 };
 
-// // user signup by email -only for facility
-// exports.signup = async (req, res) => {
-//   const { email, password, name } = req.body;
-//   const otp = generateOTP();
-//   const checkUser = await prisma.facility.findUnique({
-//     where: {
-//       email: email,
-//     },
-//   });
-
-//   if (checkUser) {
-//     return res.send("user with this email exists");
-//   }
-
-//   encrypted = generatePassword(password);
-//   const user = await prisma.facility.create({
-//     data: {
-//       email: email.toLowerCase(),
-//       role: "FACILITYADMIN",
-//       phone: "",
-//       name: name,
-//       password: encrypted,
-//       otp: otp,
-//     },
-//   });
-//   if (!user) {
-//     return res.status(500).send({
-//       message: "unable to signup, please try again later",
-//       error: error,
-//     });
-//   } else {
-//     try {
-//       await sendMail({
-//         to: email,
-//         otp: otp,
-//       });
-//       const token = jwtSign(user);
-//       // console.log(token);
-//       res.status(200).json({ token: token });
-//     } catch (error) {
-//       console.log(error);
-//       res.status(500).send({
-//         message: "unable to signup, please try again later",
-//       });
-//     }
-//   }
-// };
-
-// // user creation with role in facility
-// exports.createUser = async (req, res) => {
-//   const { email, password } = req.body;
-//   const otp = generateOTP();
-//   const user = await prisma.facility.findUnique({
-//     where: {
-//       email: email,
-//     },
-//   });
-//   if (user) {
-//     return res.send("user with this email exists");
-//   } else {
-//     encrypted = generatePassword(password);
-//     const user = new prisma.user.create({
-//       data: {
-//         email: email.toLowerCase(),
-//         password: encrypted,
-//         role: "FACILITYUSER",
-//         otp: otp,
-//       },
-//     });
-
-//     if (!user) {
-//       return res.status(500).send({
-//         message: "unable to create user, please try again later",
-//       });
-//     } else {
-//       try {
-//         await sendMail({
-//           to: email,
-//           otp: otp,
-//         });
-//         res.status(200).send({
-//           message: "user account creation success",
-//           user: user,
-//         });
-//       } catch (error) {
-//         return [
-//           false,
-//           "unable to create account, please try again later",
-//           error,
-//         ];
-//       }
-//     }
-//   }
-// };
-
-// // validate
-// const validateEmailOtp = async (email, otp) => {
-//   const user = await prisma.facility.findUnique({
-//     where: {
-//       email: email,
-//     },
-//   });
-//   if (!user) {
-//     return [false, "user doesn't exist"];
-//   }
-
-//   if (user && user.otp !== otp) {
-//     return [false, "invalid otp provided"];
-//   }
-//   const newUser = await prisma.user.update({
-//     where: {
-//       id: user.id,
-//     },
-//     data: {
-//       verified: true,
-//     },
-//   });
-//   return [true, newUser];
-// };
-
-// // email verification works
-// exports.verifyMail = async (req, res) => {
-//   const facility = req.user;
-//   console.log(facility);
-//   const { otp } = req.body;
-//   const user = await validateEmailOtp(facility.email, otp);
-//   if (!user) {
-//     return res.status(500).send({
-//       message: "Email verification failed!",
-//       error: error,
-//     });
-//   }
-//   console.log(user);
-//   res.status(200).send({
-//     message: "user verification success",
-//   });
-// };
-
-// // user login works
-// exports.login = async (req, res) => {
-//   const { email, password } = req.body;
-//   // console.log(req.body);
-//   const checkUser = await prisma.facility.findUnique({
-//     where: {
-//       email: email,
-//     },
-//   });
-//   console.log(checkUser);
-//   if (!checkUser) {
-//     return res.status(404).json({
-//       message: "user with this email doesn't exist",
-//     });
-//   }
-
-//   if (user && bcrypt.compareSync(password, user.password)) {
-//     const token = jwtSign(user);
-//     res.send({
-//       token: token,
-//       user: user,
-//       message: "authentication success",
-//     });
-//   } else {
-//     res.status(401).send({
-//       message: "Password doesn't match.",
-//     });
-//   }
-// };
+// facility profile
+exports.addFacilityProfile = async (req, res) => {
+  console.log(req.body);
+  const {
+    name,
+    email,
+    latitude,
+    longitude,
+    city,
+    country,
+    mission,
+    license,
+    licenseNumber,
+  } = req.body;
+  license_url = uploadImage(license);
+  try {
+    await prisma.facility.create({
+      data: {
+        name: name,
+        email: email,
+        latitude: latitude,
+        longitude: longitude,
+        city: city,
+        country: country,
+        mission: mission,
+        license: license_url,
+        licenseNumber: licenseNumber,
+        userId: req.user.id,
+      },
+    });
+    res.status(200).send({
+      message: "Facility Added Successfully",
+    });
+  } catch (err) {
+    res.status(500).send({
+      message: "Failed to Add Facility profile",
+    });
+  }
+};

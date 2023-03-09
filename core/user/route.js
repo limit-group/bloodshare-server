@@ -13,6 +13,7 @@ const {
   resendOTP,
   getUsers,
   createUser,
+  addFacilityProfile,
 } = require("./controller");
 const router = express.Router();
 router.get("", endpoint);
@@ -26,5 +27,6 @@ router.post("/users", isAuth, createUser);
 router.post("/password", isAuth, updatePassword);
 router.get("/profiles", isAuth, getUserProfile);
 router.post("/profiles", isAuth, addUserProfile);
+router.post("/profiles/facility", isAuth, addFacilityProfile);
 router.post("/profiles/update", isAuth, updateUserProfile);
 module.exports = router;
