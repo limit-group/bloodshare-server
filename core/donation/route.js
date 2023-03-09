@@ -1,8 +1,17 @@
 const express = require("express");
 const { isAuth } = require("../../middlewares/auth.middleware");
-const { myDonations, donated, allDonations } = require("./controller");
+const {
+  myDonations,
+  donated,
+  allDonations,
+  createRecord,
+  getRecords
+} = require("./controller");
 const router = express.Router();
 router.get("/donations", isAuth, allDonations);
 router.post("/donations", isAuth, donated);
 router.get("/donations/me", isAuth, myDonations);
+router.get("/records", isAuth, getRecords);
+router.post("/records", isAuth, createRecord);
+
 module.exports = router;

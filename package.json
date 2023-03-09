@@ -27,7 +27,8 @@
     "otp-generator": "^4.0.0",
     "pg": "^8.8.0",
     "swagger-jsdoc": "^6.2.5",
-    "swagger-ui-express": "^4.6.0"
+    "swagger-ui-express": "^4.6.0",
+    "uuidv4": "^6.2.13"
   },
   "devDependencies": {
     "prisma": "^4.5.0"

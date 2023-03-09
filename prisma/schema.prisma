@@ -83,10 +83,25 @@ model Facility {
   mission       String
   license       String
   licenseNumber String
-  users         User     @relation(fields: [userId], references: [id])
+  users         User[]
+  records       Record[]
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  userId        Int
+}
+
+model Record {
+  id           Int       @id @default(autoincrement())
+  name         String    @db.VarChar(255)
+  phoneNumber  String
+  dateOfBirth  DateTime
+  bloodType    BloodType
+  bodyWeight   String
+  donationDate DateTime
+  donationId   String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  Facility     Facility? @relation(fields: [facilityId], references: [id])
+  facilityId   Int?
 }
 
 model Donation {

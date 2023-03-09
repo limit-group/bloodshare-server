@@ -1,4 +1,5 @@
 const prisma = require("../../utils/db.utils");
+const { uuid } = require("uuidv4");
 
 exports.allDonations = async (req, res) => {
   const donations = await prisma.donation.findMany({
@@ -58,4 +59,53 @@ exports.donated = async (req, res) => {
     return res.status(500).send({ message: "Failed to record donation." });
   }
   res.send(201).send({ message: "Donation Saved." });
+};
+
+exports.createRecord = async (req, res) => {
+  const { name, bodyWeight, bloodType, donationDate } = req.body;
+
+  try {
+    const facility = await prisma.facility.findFirst({
+      where: {
+        userId: req.user.id,
+      },
+    });
+    const record = await prisma.record.create({
+      data: {
+        name: name,
+        bodyWeight: bodyWeight,
+        bloodType: bloodType,
+        donationDate: donationDate,
+        donationId: uuid(),
+        facilityId: facility.id,
+      },
+    });
+    res.status(201).send({
+      donationId: record.donationId,
+    });
+  } catch (err) {
+    res.status(500).send({
+      message: "failed to add record",
+    });
+  }
+};
+
+exports.getRecords = async (req, res) => {
+  try {
+    const facility = await prisma.facility.findFirst({
+      where: {
+        userId: req.user.id,
+      },
+    });
+    const records = await prisma.record.findMany({
+      where: {
+        facilityId: facility.id,
+      },
+    });
+    res.status(200).send(records);
+  } catch (err) {
+    res.status(500).send({
+      message: "failed to fetch records",
+    });
+  }
 };
