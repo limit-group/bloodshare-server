@@ -53,7 +53,8 @@ model User {
   donations   Donation[]
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-  Facility    Facility[]
+  facility    Facility? @relation(fields: [facilityId], references: [id]) 
+  facilityId  Int?    
 }
 
 model Profile {
@@ -98,6 +99,8 @@ model Record {
   bodyWeight   String
   donationDate DateTime
   donationId   String
+  bloodUnits   Int
+  gender        Gender
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   Facility     Facility? @relation(fields: [facilityId], references: [id])

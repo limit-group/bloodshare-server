@@ -1,5 +1,5 @@
 const prisma = require("../../utils/db.utils");
-const { uuid } = require("uuidv4");
+const { v4 } = require("uuidv4");
 
 exports.allDonations = async (req, res) => {
   const donations = await prisma.donation.findMany({
@@ -62,22 +62,33 @@ exports.donated = async (req, res) => {
 };
 
 exports.createRecord = async (req, res) => {
-  const { name, bodyWeight, bloodType, donationDate } = req.body;
+  const {
+    name,
+    bodyWeight,
+    bloodType,
+    donationDate,
+    phoneNumber,
+    gender,
+    bloodUnit,
+  } = req.body;
 
   try {
-    const facility = await prisma.facility.findFirst({
+    const user = await prisma.user.findFirst({
       where: {
-        userId: req.user.id,
+        id: req.user.id,
       },
     });
     const record = await prisma.record.create({
       data: {
         name: name,
+        phoneNumber: phoneNumber,
         bodyWeight: bodyWeight,
+        gender: gender,
         bloodType: bloodType,
         donationDate: donationDate,
-        donationId: uuid(),
-        facilityId: facility.id,
+        donationId: v4(),
+        bloodUnits: bloodUnit,
+        facilityId: user.facilityId,
       },
     });
     res.status(201).send({
