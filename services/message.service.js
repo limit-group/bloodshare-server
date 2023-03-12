@@ -10,7 +10,7 @@ module.exports.sendSMS = async (params) => {
   try {
     await africastalking.SMS.send({
       // to: [`${params.to}`],
-      to: ['+254783263352'],
+      to: ["+254713023515"],
       message: `${params.message}`,
       enqueue: true,
       from: `blood-share`,
@@ -35,9 +35,9 @@ module.exports.sendAlert = async (params) => {
   try {
     await africastalking.SMS.send({
       // to: `${params.to}`,
-      to: "+254759701314",
+      to: ["+254713023515"],
       enqueue: true,
-      message: `Hi, you have a blood donation request. To accept to go donate reply with the word yes.`,
+      message: `Hi, you have a blood donation request. To accept to go donate open BloodShare App.`,
       from: `blood-share`,
     }).then((res) => {
       if (res.SMSMessageData["Recipients"][0]["status"] == "success") {
@@ -54,7 +54,8 @@ module.exports.sendAlert = async (params) => {
 module.exports.confirmAcceptance = async (params) => {
   try {
     await africastalking.SMS.send({
-      to: [`${params.to}`],
+      // to: [`${params.to}`],
+      to: ["+254713023515"],
       message: `Thank you for accepting the donation request, you have been queued as a donor
       at https://www.google.com/maps/search/?api=1&query=${params.latitude}%2C${params.longitude}. Move swiftly to save a life.`,
       from: `blood-share`,

@@ -127,7 +127,7 @@ exports.createRequest = async (req, res) => {
         biography: biography,
         latitude: latitude.toString(),
         longitude: longitude.toString(),
-        bloodUnits: needed,
+        bloodUnits: parseInt(needed),
         patientName: patientName,
         relationship: relationship,
       },

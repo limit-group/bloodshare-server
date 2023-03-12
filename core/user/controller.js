@@ -3,7 +3,6 @@ const bcrypt = require("bcryptjs");
 const { jwtSign } = require("../../middlewares/auth.middleware");
 const { generateOTP } = require("../../services/otp.service");
 const { sendSMS } = require("../../services/message.service");
-const { uploadImage } = require("../../services/media.service");
 
 // EPI
 exports.endpoint = (req, res) => {
@@ -211,7 +210,7 @@ exports.addUserProfile = async (req, res) => {
     email,
     gender,
   } = req.body;
-  const image_url = await uploadImage(image);
+  const image_url = req.file.filename;
   if (!image_url) {
     return res.status(500).send({ message: "failed to upload your avatar." });
   }
@@ -242,14 +241,12 @@ exports.addUserProfile = async (req, res) => {
 // works -- can be updated.
 exports.updateUserProfile = async (req, res) => {
   const { fullName, image, email } = req.body;
-  const image_url = uploadImage(image);
   const profile = await prisma.profile.update({
     where: {
       userId: req.user.id,
     },
     data: {
       name: fullName,
-      avatar: image_url,
       email: email,
     },
   });
@@ -315,30 +312,27 @@ exports.createUser = async (req, res) => {
 exports.addFacilityProfile = async (req, res) => {
   console.log(req.body);
   const {
-    name,
+    fname,
     email,
     latitude,
     longitude,
     city,
     country,
     mission,
-    license,
     licenseNumber,
   } = req.body;
-  license_url = uploadImage(license);
   try {
     await prisma.facility.create({
       data: {
-        name: name,
+        name: fname,
         email: email,
         latitude: latitude,
         longitude: longitude,
         city: city,
         country: country,
         mission: mission,
-        license: license_url,
+        license: req.file.filename,
         licenseNumber: licenseNumber,
-        userId: req.user.id,
       },
     });
     res.status(200).send({
@@ -347,6 +341,29 @@ exports.addFacilityProfile = async (req, res) => {
   } catch (err) {
     res.status(500).send({
       message: "Failed to Add Facility profile",
+    });
+  }
+};
+
+exports.getFacilityProfile = async (req, res) => {
+  try {
+    const facility = await prisma.user.findFirst({
+      where: {
+        id: req.user.id,
+      },
+    });
+    // console.log(facility);
+    const profile = await prisma.facility.findFirst({
+      where: {
+        id: facility.facilityId,
+      },
+    });
+    // console.log(profile);
+    res.status(200).send(profile);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      message: "Failed to fetch facility profile!",
     });
   }
 };

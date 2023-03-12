@@ -53,8 +53,8 @@ model User {
   donations   Donation[]
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-  facility    Facility? @relation(fields: [facilityId], references: [id]) 
-  facilityId  Int?    
+  facility    Facility?  @relation(fields: [facilityId], references: [id])
+  facilityId  Int?
 }
 
 model Profile {
@@ -79,11 +79,15 @@ model Facility {
   id            Int      @id @default(autoincrement())
   name          String   @db.VarChar(255)
   email         String?  @db.VarChar(255)
+  verified      Boolean  @default(false)
   latitude      String?
   longitude     String?
+  city          String
+  country       String
   mission       String
   license       String
   licenseNumber String
+  logo          String?
   users         User[]
   records       Record[]
   createdAt     DateTime @default(now())
@@ -100,7 +104,7 @@ model Record {
   donationDate DateTime
   donationId   String
   bloodUnits   Int
-  gender        Gender
+  gender       Gender
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   Facility     Facility? @relation(fields: [facilityId], references: [id])
