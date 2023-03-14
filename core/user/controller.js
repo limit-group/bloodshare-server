@@ -12,28 +12,36 @@ exports.endpoint = (req, res) => {
 };
 
 // validate otp sent via sms.
-const validatePhoneOtp = async (id, otp) => {
+const validatePhoneOtp = async (phone, otp) => {
+  console.log(phone);
   // check user
-  const user = await prisma.user.findUnique({
+  const user = await prisma.user.findFirst({
     where: {
-      id: id,
+      phoneNumber: phone,
     },
   });
+  console.log(user);
   if (!user) {
-    return [false, "User doesn't exist"];
+    return false;
   }
+
   if (user && user.otp !== otp) {
-    return [false, "Invalid otp provided"];
+    return false;
   }
-  const newUser = await prisma.user.update({
-    where: {
-      id: user.id,
-    },
-    data: {
-      verified: true,
-    },
-  });
-  return [true, newUser];
+  try {
+    await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        verified: true,
+      },
+    });
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
 };
 
 // generated password
@@ -44,6 +52,7 @@ const generatePassword = (password) => {
 
 // user signup by mobile number
 exports.mobileSignup = async (req, res) => {
+  console.log(req.body);
   const { password, phone, role } = req.body;
   const otp = generateOTP();
   // check if account exists
@@ -52,35 +61,39 @@ exports.mobileSignup = async (req, res) => {
       phoneNumber: phone,
     },
   });
-  if (user) {
-    return res
-      .status(400)
-      .send({ message: "User with this phone number exists!" });
-  }
-  // create new user
-  const new_user = await prisma.user.create({
-    data: {
-      phoneNumber: phone,
-      password: generatePassword(password),
-      otp: otp,
-      role: role,
-    },
-  });
-  if (!new_user) {
+  console.log(user);
+  if (!user) {
+    // create new user
+    const new_user = await prisma.user.create({
+      data: {
+        phoneNumber: phone,
+        password: generatePassword(password),
+        otp: otp,
+        role: role,
+      },
+    });
+    if (!new_user) {
+      return res
+        .status(500)
+        .send({ message: "Unable to signup, please try again later!" });
+    }
+    // send otp message.
+    const info = await sendSMS({
+      to: phone,
+      message: `Enter this code ${otp} to verify your account . Thank you.`,
+    });
+
+    // if (!info) {
+    //   return res.status(500).send("Unable to signup, please try again later!");
+    // }
+    res.status(201).send({
+      message: "User Created.",
+    });
+  } else {
     return res
       .status(500)
-      .send({ message: "Unable to signup, please try again later!" });
+      .send({ message: "User with this phone number exists!" });
   }
-  // send otp message.
-  const info = await sendSMS({
-    to: phone,
-    message: `Enter this code ${otp} to verify your account . Thank you.`,
-  });
-
-  // if (!info) {
-  //   return res.status(500).send("Unable to signup, please try again later!");
-  // }
-  res.status(200).send(jwtSign(new_user));
 };
 
 // user login works
@@ -108,9 +121,8 @@ exports.mobileLogin = async (req, res) => {
 };
 
 exports.verifyPhone = async (req, res) => {
-  const u = req.user;
-  const { otp } = req.body;
-  const user = await validatePhoneOtp(u.id, otp);
+  const { otp, phone } = req.body;
+  const user = await validatePhoneOtp(phone, otp);
   if (!user) {
     res.status(500).send({ message: "Phone verification failed!" });
   }
@@ -200,11 +212,11 @@ exports.getUserProfile = async (req, res) => {
 
 // works for -- normal user.
 exports.addUserProfile = async (req, res) => {
+  console.log(req.body);
   const {
     fullName,
     dob,
     bloodType,
-    image,
     latitude,
     longitude,
     email,

@@ -45,8 +45,10 @@ exports.getLatestRequest = async (req, res) => {
       orderBy: {
         id: "desc",
       },
-      take: 1,
+      take: 2,
     });
+
+  // broadcasts.filter()
     res.status(200).send({
       broadcasts: broadcasts,
       request_count: request_count,
