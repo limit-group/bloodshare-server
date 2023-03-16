@@ -29,7 +29,14 @@ exports.getRequest = async (req, res) => {
         id: "desc",
       },
     });
-    res.status(200).send(broadcasts);
+
+    const new_b = [];
+    broadcasts.forEach((element) => {
+      if (element.accept < 3) {
+        new_b.push(element);
+      }
+    });
+    res.status(200).send(new_b);
   } catch (error) {
     console.log(error);
     res.status(500).send({ message: "Something went wrong!" });
@@ -47,10 +54,14 @@ exports.getLatestRequest = async (req, res) => {
       },
       take: 2,
     });
-
-  // broadcasts.filter()
+    const new_b = [];
+    broadcasts.forEach((element) => {
+      if (element.accept < 3) {
+        new_b.push(element);
+      }
+    });
     res.status(200).send({
-      broadcasts: broadcasts,
+      broadcasts: new_b,
       request_count: request_count,
       donations_count: donations_count,
     });
@@ -149,59 +160,54 @@ exports.createRequest = async (req, res) => {
 
 //when someone accept to donate
 exports.acceptBroadcast = async (req, res) => {
-  if (checkAccepted(req.params.requestId)) {
-    return res.status(200).send({
-      message: "enough people have already accepted to donate.",
-    });
-  }
+  const acceptCount = 3;
   try {
-    const request = await prisma.request.update({
+    const request = await prisma.request.findUnique({
       where: {
-        id: req.params.requestId,
+        id: parseInt(req.params.requestId),
       },
-      data: {
-        accept: {
-          increment: 1,
+    });
+    if (request.accept < acceptCount) {
+      const request = await prisma.request.update({
+        where: {
+          id: parseInt(req.params.requestId),
         },
-      },
-    });
+        data: {
+          accept: {
+            increment: 1,
+          },
+        },
+      });
 
-    //find user
-    const user = await prisma.user.findUnique({
-      where: {
-        userId: request.userId,
-      },
-    });
+      //find user
+      const user = await prisma.user.findUnique({
+        where: {
+          id: request.userId,
+        },
+      });
 
-    // Send message with directions.
-    const info = confirmAcceptance({
-      to: user.phoneNumber,
-      latitude: request.latitude,
-      longitude: request.longitude,
-    });
+      // Send message with directions.
+      const info = await confirmAcceptance({
+        to: user.phoneNumber,
+        latitude: request.latitude,
+        longitude: request.longitude,
+      });
 
-    if (info) {
-      console.log(info);
+      if (info) {
+        console.log(info);
+      }
+      res.status(201).send({
+        message: "Thank for accepting to save lives.",
+      });
+    } else {
+      return res.status(200).send({
+        message: "enough people have already accepted to donate.",
+      });
     }
-    res.status(200).send({
-      message: "Thank for accepting to save lives.",
-    });
-  } catch (error) {
+  } catch (err) {
+    console.log(err);
     return res.status(500).send({
       message: "Could not complete request.",
     });
   }
 };
-
-async function checkAccepted(reqId) {
-  const acceptCount = 3;
-  const request = await prisma.request.findUnique({
-    where: {
-      id: parseInt(reqId),
-    },
-  });
-  if (request.accept == acceptCount) {
-    return true;
-  }
-  return false;
-}

@@ -14,6 +14,11 @@ app.use(
     extended: true,
   })
 );
+// Function to serve all static files
+// inside public directory.
+app.use(express.static("public"));
+app.use("/images", express.static("images"));
+app.use("/avatars", express.static("avatars"));
 const authRouter = require("./core/user/route");
 const donationRouter = require("./core/donation/route");
 const requestRouter = require("./core/request/route");

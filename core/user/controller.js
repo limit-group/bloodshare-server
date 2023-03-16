@@ -11,39 +11,6 @@ exports.endpoint = (req, res) => {
   });
 };
 
-// validate otp sent via sms.
-const validatePhoneOtp = async (phone, otp) => {
-  console.log(phone);
-  // check user
-  const user = await prisma.user.findFirst({
-    where: {
-      phoneNumber: phone,
-    },
-  });
-  console.log(user);
-  if (!user) {
-    return false;
-  }
-
-  if (user && user.otp !== otp) {
-    return false;
-  }
-  try {
-    await prisma.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        verified: true,
-      },
-    });
-    return true;
-  } catch (err) {
-    console.log(err);
-    return false;
-  }
-};
-
 // generated password
 const generatePassword = (password) => {
   encrypted = bcrypt.hashSync(password, 10);
@@ -117,12 +84,37 @@ exports.mobileLogin = async (req, res) => {
 };
 
 exports.verifyPhone = async (req, res) => {
-  const { otp, phone } = req.body;
-  const user = await validatePhoneOtp(phone, otp);
-  if (!user) {
+  const { code, phone } = req.body;
+  try {
+    const user = await prisma.user.findFirst({
+      where: {
+        phoneNumber: phone,
+      },
+    });
+    // validate otp sent via sms.
+    if (user && user.otp == code) {
+      try {
+        const n = await prisma.user.update({
+          where: {
+            // id: user.id,
+            phoneNumber: phone,
+          },
+          data: {
+            verified: true,
+          },
+        });
+        console.log(n);
+        res.status(200).send({ message: "User verification success" });
+      } catch (err) {
+        console.log(err);
+        res.status(500).send({ message: "An Error occurred, Retry!" });
+      }
+    } else {
+      res.status(500).send({ message: "An Invalid Code supplied!" });
+    }
+  } catch (err) {
     res.status(500).send({ message: "Phone verification failed!" });
   }
-  res.status(200).send({ message: "User verification success" });
 };
 
 // password change - Can be used for both phone and email
@@ -204,6 +196,7 @@ exports.getUserProfile = async (req, res) => {
 // works for -- normal user.
 exports.addUserProfile = async (req, res) => {
   console.log(req.body);
+  console.log(req.user.id);
   const {
     fullName,
     dob,
@@ -218,8 +211,9 @@ exports.addUserProfile = async (req, res) => {
   if (!image_url) {
     return res.status(500).send({ message: "failed to upload your avatar." });
   }
+
   try {
-    await prisma.profile.create({
+    const n = await prisma.profile.create({
       data: {
         userId: req.user.id,
         name: fullName,
@@ -233,7 +227,8 @@ exports.addUserProfile = async (req, res) => {
         // longitude: longitude.toString(),
       },
     });
-    return res.status(201).send({
+    console.log(n);
+    res.status(201).send({
       message: "profile created Success",
     });
   } catch (err) {
@@ -246,22 +241,25 @@ exports.addUserProfile = async (req, res) => {
 
 // works -- can be updated.
 exports.updateUserProfile = async (req, res) => {
-  const { fullName, image, email } = req.body;
-  const profile = await prisma.profile.update({
-    where: {
-      userId: req.user.id,
-    },
-    data: {
-      name: fullName,
-      email: email,
-    },
-  });
-  if (!profile) {
-    return res.status(500).send({
+  const { fullName, image, email, dob } = req.body;
+  console.log(req.body);
+  try {
+    await prisma.profile.update({
+      where: {
+        userId: req.user.id,
+      },
+      data: {
+        name: fullName,
+        email: email,
+        dateOfBirth: dob,
+      },
+    });
+    res.status(200).send({ message: "profile updated" });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
       message: "user profile failure",
     });
-  } else {
-    return res.status(200).send(profile);
   }
 };
 

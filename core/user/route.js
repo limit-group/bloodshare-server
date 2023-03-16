@@ -17,7 +17,7 @@ const {
   getFacilityProfile,
 } = require("./controller");
 const router = express.Router();
-const DIR = "./public/images";
+const DIR = "./public/avatars";
 const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
 
