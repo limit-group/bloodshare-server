@@ -82,10 +82,6 @@ exports.mobileSignup = async (req, res) => {
       to: phone,
       message: `Enter this code ${otp} to verify your account . Thank you.`,
     });
-
-    // if (!info) {
-    //   return res.status(500).send("Unable to signup, please try again later!");
-    // }
     res.status(201).send({
       message: "User Created.",
     });
@@ -131,20 +127,20 @@ exports.verifyPhone = async (req, res) => {
 
 // password change - Can be used for both phone and email
 exports.updatePassword = async (req, res) => {
-  encrypted = generatePassword(req.body.password);
-  const user = await prisma.user.update({
-    where: {
-      id: req.user.id,
-    },
-    data: {
-      password: encrypted,
-    },
-  });
-
-  if (!user) {
+  try {
+    encrypted = generatePassword(req.body.password);
+    const user = await prisma.user.update({
+      where: {
+        id: req.user.id,
+      },
+      data: {
+        password: encrypted,
+      },
+    });
+    res.status(200).send({ message: "password change successful" });
+  } catch (err) {
     res.status(500).send({ message: "password update failure" });
   }
-  res.status(200).send({ message: "password change successful" });
 };
 
 // TODO: forgot password
@@ -164,7 +160,6 @@ exports.forgotPassword = async (req, res) => {
   }
 };
 
-// TODO: resend otp
 exports.resendOTP = async (req, res) => {
   const otp = generateOTP();
   const info = await sendSMS({
@@ -172,9 +167,6 @@ exports.resendOTP = async (req, res) => {
     message: `Enter this code ${otp} to recover your account .Thank you.`,
   });
   console.log(info);
-  // if (!info) {
-  //   return res.status(500).send({ message: "Failed to send OTP!" });
-  // }
   try {
     await prisma.user.update({
       where: {
@@ -195,19 +187,18 @@ exports.resendOTP = async (req, res) => {
 
 // user profile -- can be used for both facility an normal user.
 exports.getUserProfile = async (req, res) => {
-  const profile = await prisma.profile.findUnique({
-    where: {
-      userId: 1,
-    },
-  });
-  // console.log(profile);
-  if (!profile) {
+  try {
+    const profile = await prisma.profile.findUnique({
+      where: {
+        userId: req.user.id,
+      },
+    });
+    res.status(200).send(profile);
+  } catch (err) {
     return res.status(404).send({
-      message: "Profile requested not found!",
+      message: "profile requested not found!",
     });
   }
-
-  res.status(200).send(profile);
 };
 
 // works for -- normal user.
@@ -219,6 +210,7 @@ exports.addUserProfile = async (req, res) => {
     bloodType,
     latitude,
     longitude,
+    bodyWeight,
     email,
     gender,
   } = req.body;
@@ -226,28 +218,30 @@ exports.addUserProfile = async (req, res) => {
   if (!image_url) {
     return res.status(500).send({ message: "failed to upload your avatar." });
   }
-  const profile = await prisma.profile.create({
-    data: {
-      userId: req.user.id,
-      name: fullName,
-      dateOfBirth: dob,
-      bloodType: bloodType,
-      gender: gender,
-      avatar: image_url,
-      email: email,
-      // latitude: latitude.toString(),
-      // longitude: longitude.toString(),
-    },
-  });
-  if (!profile) {
+  try {
+    await prisma.profile.create({
+      data: {
+        userId: req.user.id,
+        name: fullName,
+        bloodType: bloodType,
+        gender: gender,
+        avatar: image_url,
+        email: email,
+        bodyWeight: bodyWeight,
+        dateOfBirth: dob,
+        // latitude: latitude.toString(),
+        // longitude: longitude.toString(),
+      },
+    });
+    return res.status(201).send({
+      message: "profile created Success",
+    });
+  } catch (err) {
+    console.log(err);
     return res.status(500).send({
       message: "user profile creation failure",
     });
   }
-
-  return res.status(201).send({
-    message: "profile created Success",
-  });
 };
 
 // works -- can be updated.

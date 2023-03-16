@@ -64,8 +64,8 @@ model Profile {
   name        String    @db.VarChar(255)
   email       String?   @db.VarChar(255)
   gender      Gender
-  avatar      String    @default("https://i.postimg.cc/zBDxKxMp/avatar.png")
-  dateOfBirth DateTime
+  avatar      String    @default("avatar.png")
+  dateOfBirth DateTime?
   bloodType   BloodType @unique
   bodyWeight  String?
   latitude    String?
