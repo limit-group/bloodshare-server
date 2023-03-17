@@ -1,5 +1,5 @@
 const prisma = require("../../utils/db.utils");
-const { v4 } = require("uuidv4");;
+const { v4: uuidv4 } = require("uuid");
 
 exports.allDonations = async (req, res) => {
   try {
@@ -68,12 +68,13 @@ exports.createRecord = async (req, res) => {
     bloodType,
     donationDate,
     phoneNumber,
+    dateOfBirth,
     gender,
     bloodUnit,
   } = req.body;
 
   try {
-    const user = await prisma.user.findUnique({
+    const user = await prisma.user.findFirst({
       where: {
         id: req.user.id,
       },
@@ -82,12 +83,13 @@ exports.createRecord = async (req, res) => {
       data: {
         name: name,
         phoneNumber: phoneNumber,
-        bodyWeight: bodyWeight,
-        gender: gender,
+        dateOfBirth: new Date(dateOfBirth),
         bloodType: bloodType,
+        bodyWeight: bodyWeight,
         donationDate: donationDate,
-        donationId: v4(),
-        bloodUnits: bloodUnit,
+        donationId: uuidv4().replace(/-/g, '').substring(0, 7),
+        bloodUnits: parseInt(bloodUnit),
+        gender: gender,
         facilityId: user.facilityId,
       },
     });
@@ -103,14 +105,14 @@ exports.createRecord = async (req, res) => {
 
 exports.getRecords = async (req, res) => {
   try {
-    const facility = await prisma.facility.findFirst({
+    const user = await prisma.user.findFirst({
       where: {
-        userId: req.user.id,
+        id: req.user.id,
       },
     });
     const records = await prisma.record.findMany({
       where: {
-        facilityId: facility.id,
+        facilityId: user.facilityId,
       },
     });
     res.status(200).send(records);
@@ -124,7 +126,6 @@ exports.getRecords = async (req, res) => {
 exports.getAllRecords = async (req, res) => {
   try {
     const records = await prisma.record.findMany({});
-    console.log(records);
     res.status(200).send(records);
   } catch (err) {
     res.status(500).send({

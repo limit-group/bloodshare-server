@@ -43,6 +43,6 @@ router.post("/password", isAuth, updatePassword);
 router.get("/profiles", isAuth, getUserProfile);
 router.post("/profiles", isAuth, upload.single("image"), addUserProfile);
 router.get("/facility", isAuth, getFacilityProfile);
-router.post("/facility", isAuth, upload.single("license"), addFacilityProfile);
+router.post("/facility", upload.single("license"), addFacilityProfile);
 router.post("/profiles/update", isAuth, updateUserProfile);
 module.exports = router;

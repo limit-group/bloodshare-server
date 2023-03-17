@@ -14,7 +14,7 @@ exports.feedsByMe = async (req, res) => {
       message: "Failed to fetch donation feed.",
     });
   }
-  res.send(200).send(donations);
+  res.status(200).send(donations);
 };
 
 // fecth donation feed.

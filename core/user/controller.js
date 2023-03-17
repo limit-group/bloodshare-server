@@ -19,7 +19,6 @@ const generatePassword = (password) => {
 
 // user signup by mobile number
 exports.mobileSignup = async (req, res) => {
-  console.log(req.body);
   const { password, phone, role } = req.body;
   const otp = generateOTP();
   // check if account exists
@@ -28,7 +27,6 @@ exports.mobileSignup = async (req, res) => {
       phoneNumber: phone,
     },
   });
-  console.log(user);
   if (!user) {
     // create new user
     const new_user = await prisma.user.create({
@@ -45,7 +43,7 @@ exports.mobileSignup = async (req, res) => {
         .send({ message: "Unable to signup, please try again later!" });
     }
     // send otp message.
-    const info = await sendSMS({
+    await sendSMS({
       to: phone,
       message: `Enter this code ${otp} to verify your account . Thank you.`,
     });
@@ -94,16 +92,14 @@ exports.verifyPhone = async (req, res) => {
     // validate otp sent via sms.
     if (user && user.otp == code) {
       try {
-        const n = await prisma.user.update({
+        await prisma.user.update({
           where: {
-            // id: user.id,
             phoneNumber: phone,
           },
           data: {
             verified: true,
           },
         });
-        console.log(n);
         res.status(200).send({ message: "User verification success" });
       } catch (err) {
         console.log(err);
@@ -121,7 +117,7 @@ exports.verifyPhone = async (req, res) => {
 exports.updatePassword = async (req, res) => {
   try {
     encrypted = generatePassword(req.body.password);
-    const user = await prisma.user.update({
+    await prisma.user.update({
       where: {
         id: req.user.id,
       },
@@ -135,7 +131,6 @@ exports.updatePassword = async (req, res) => {
   }
 };
 
-// TODO: forgot password
 exports.forgotPassword = async (req, res) => {
   try {
     await prisma.user.findUnique({
@@ -158,7 +153,6 @@ exports.resendOTP = async (req, res) => {
     to: req.body.phone,
     message: `Enter this code ${otp} to recover your account .Thank you.`,
   });
-  console.log(info);
   try {
     await prisma.user.update({
       where: {
@@ -180,7 +174,7 @@ exports.resendOTP = async (req, res) => {
 // user profile -- can be used for both facility an normal user.
 exports.getUserProfile = async (req, res) => {
   try {
-    const profile = await prisma.profile.findUnique({
+    const profile = await prisma.profile.findFirst({
       where: {
         userId: req.user.id,
       },
@@ -195,8 +189,6 @@ exports.getUserProfile = async (req, res) => {
 
 // works for -- normal user.
 exports.addUserProfile = async (req, res) => {
-  console.log(req.body);
-  console.log(req.user.id);
   const {
     fullName,
     dob,
@@ -213,7 +205,7 @@ exports.addUserProfile = async (req, res) => {
   }
 
   try {
-    const n = await prisma.profile.create({
+    await prisma.profile.create({
       data: {
         userId: req.user.id,
         name: fullName,
@@ -227,7 +219,6 @@ exports.addUserProfile = async (req, res) => {
         // longitude: longitude.toString(),
       },
     });
-    console.log(n);
     res.status(201).send({
       message: "profile created Success",
     });
@@ -242,7 +233,6 @@ exports.addUserProfile = async (req, res) => {
 // works -- can be updated.
 exports.updateUserProfile = async (req, res) => {
   const { fullName, image, email, dob } = req.body;
-  console.log(req.body);
   try {
     await prisma.profile.update({
       where: {
@@ -314,8 +304,8 @@ exports.createUser = async (req, res) => {
 
 // facility profile
 exports.addFacilityProfile = async (req, res) => {
-  console.log(req.body);
   const {
+    phone,
     fname,
     email,
     latitude,
@@ -326,7 +316,7 @@ exports.addFacilityProfile = async (req, res) => {
     licenseNumber,
   } = req.body;
   try {
-    await prisma.facility.create({
+    const facility = await prisma.facility.create({
       data: {
         name: fname,
         email: email,
@@ -339,12 +329,21 @@ exports.addFacilityProfile = async (req, res) => {
         licenseNumber: licenseNumber,
       },
     });
-    res.status(200).send({
-      message: "Facility Added Successfully",
+    await prisma.user.update({
+      where: {
+        phoneNumber: phone,
+      },
+      data: {
+        facilityId: facility.id,
+      },
+    });
+
+    res.status(201).send({
+      message: "facility added success",
     });
   } catch (err) {
     res.status(500).send({
-      message: "Failed to Add Facility profile",
+      message: "failed to add Facility profile",
     });
   }
 };
@@ -356,18 +355,16 @@ exports.getFacilityProfile = async (req, res) => {
         id: req.user.id,
       },
     });
-    // console.log(facility);
     const profile = await prisma.facility.findFirst({
       where: {
         id: facility.facilityId,
       },
     });
-    // console.log(profile);
     res.status(200).send(profile);
   } catch (err) {
     console.log(err);
     res.status(500).send({
-      message: "Failed to fetch facility profile!",
+      message: "failed to fetch facility profile!",
     });
   }
 };
