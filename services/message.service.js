@@ -5,7 +5,6 @@ const africastalking = AfricasTalking({
   username: process.env.AT_NAME,
 });
 
-// TODO: Complete the AT messaging Service
 module.exports.sendSMS = async (params) => {
   try {
     await africastalking.SMS.send({

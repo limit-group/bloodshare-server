@@ -1,8 +1,8 @@
 const {
   sendAlert,
   confirmAcceptance,
-} = require("../../services/message.service");
-const prisma = require("../../utils/db.utils");
+} = require("../services/message.service");
+const prisma = require("../utils/db.utils");
 
 exports.requestByMe = async (req, res) => {
   try {
@@ -29,7 +29,6 @@ exports.getRequest = async (req, res) => {
         id: "desc",
       },
     });
-
     const new_b = [];
     broadcasts.forEach((element) => {
       if (element.accept < 3) {
@@ -187,15 +186,11 @@ exports.acceptBroadcast = async (req, res) => {
       });
 
       // Send message with directions.
-      const info = await confirmAcceptance({
+      await confirmAcceptance({
         to: user.phoneNumber,
         latitude: request.latitude,
         longitude: request.longitude,
       });
-
-      if (info) {
-        console.log(info);
-      }
       res.status(201).send({
         message: "Thank for accepting to save lives.",
       });

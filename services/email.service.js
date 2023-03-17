@@ -13,7 +13,7 @@ module.exports.sendMail = async (params) => {
     let info = await transporter.sendMail({
       from: MAIL_SETTINGS.auth.user,
       to: params.to,
-      subject: "Verify your Emergencare facility Account",
+      subject: "Verify your BloodShare facility Account",
       html: `
             <div class="container" style="max-width: auto; padding-top: 20px">
                 <h2>Thank you for taking a step into saving lives.</h2>

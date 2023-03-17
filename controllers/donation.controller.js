@@ -1,4 +1,4 @@
-const prisma = require("../../utils/db.utils");
+const prisma = require("../utils/db.utils");
 const { v4: uuidv4 } = require("uuid");
 
 exports.allDonations = async (req, res) => {
@@ -53,7 +53,6 @@ exports.donated = async (req, res) => {
         },
       },
     });
-
     res.status(201).send({ message: "Donation Saved." });
   } catch (err) {
     console.log(err);
@@ -87,7 +86,7 @@ exports.createRecord = async (req, res) => {
         bloodType: bloodType,
         bodyWeight: bodyWeight,
         donationDate: donationDate,
-        donationId: uuidv4().replace(/-/g, '').substring(0, 7),
+        donationId: uuidv4().replace(/-/g, "").substring(0, 7),
         bloodUnits: parseInt(bloodUnit),
         gender: gender,
         facilityId: user.facilityId,
@@ -128,7 +127,7 @@ exports.getAllRecords = async (req, res) => {
     const records = await prisma.record.findMany({});
     res.status(200).send(records);
   } catch (err) {
-    res.status(500).send({
+    return res.status(500).send({
       message: "failed to fetch records",
     });
   }

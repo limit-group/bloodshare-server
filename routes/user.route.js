@@ -1,25 +1,25 @@
 const express = require("express");
-const { isAuth } = require("../../middlewares/auth.middleware");
-const {
-  mobileLogin,
-  mobileSignup,
-  verifyPhone,
-  updatePassword,
-  getUserProfile,
-  addUserProfile,
-  updateUserProfile,
-  forgotPassword,
-  endpoint,
-  resendOTP,
-  getUsers,
-  createUser,
-  addFacilityProfile,
-  getFacilityProfile,
-} = require("./controller");
+const { isAuth } = require("../middlewares/auth.middleware");
 const router = express.Router();
 const DIR = "./public/avatars";
 const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
+const {
+  endpoint,
+  mobileLogin,
+  mobileSignup,
+  verifyPhone,
+  forgotPassword,
+  resendOTP,
+  getUsers,
+  createUser,
+  updatePassword,
+  getUserProfile,
+  addUserProfile,
+  getFacilityProfile,
+  addFacilityProfile,
+  updateUserProfile,
+} = require("../controllers/user.controller");
 
 //multer instance to handle file storage location and filename
 const upload = multer({

@@ -19,10 +19,10 @@ app.use(
 app.use(express.static("public"));
 app.use("/images", express.static("images"));
 app.use("/avatars", express.static("avatars"));
-const authRouter = require("./core/user/route");
-const donationRouter = require("./core/donation/route");
-const requestRouter = require("./core/request/route");
-const feedRouter = require("./core/feed/route");
+const authRouter = require("./routes/user.route");
+const donationRouter = require("./routes/donation.route");
+const requestRouter = require("./routes/request.route");
+const feedRouter = require("./routes/feed.route");
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/api", donationRouter);

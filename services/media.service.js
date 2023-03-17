@@ -5,8 +5,8 @@ const cloudinary = require("cloudinary").v2;
 cloudinary.config({
   secure: true,
   cloud_name: "sokocrud3",
-  api_key: "829999173198241",
-  api_secret: "T4XOEfmKDRUyb-v6yYBgt52LLLw",
+  api_key: process.env.CLOUDINARY_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET,
 });
 
 // Log the configuration

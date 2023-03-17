@@ -1,5 +1,5 @@
 const express = require("express");
-const { isAuth } = require("../../middlewares/auth.middleware");
+const { isAuth } = require("../middlewares/auth.middleware");
 const {
   myDonations,
   donated,
@@ -7,7 +7,7 @@ const {
   createRecord,
   getRecords,
   getAllRecords,
-} = require("./controller");
+} = require("../controllers/donation.controller");
 const router = express.Router();
 router.get("/donations", isAuth, allDonations);
 router.post("/donations", isAuth, donated);

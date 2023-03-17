@@ -1,15 +1,15 @@
 const express = require("express");
-const { isAuth } = require("../../middlewares/auth.middleware");
-const {
-  getFeeds,
-  createFeed,
-  feedsByMe,
-  attendDrive,
-} = require("./controller");
+const { isAuth } = require("../middlewares/auth.middleware");
 const router = express.Router();
 const DIR = "./public/images";
 const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
+const {
+  getFeeds,
+  createFeed,
+  attendDrive,
+  feedsByMe,
+} = require("../controllers/feed.controller");
 
 //multer instance to handle file storage location and filename
 const upload = multer({

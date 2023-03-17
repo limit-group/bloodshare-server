@@ -1,8 +1,8 @@
-const prisma = require("../../utils/db.utils");
+const prisma = require("../utils/db.utils");
 const bcrypt = require("bcryptjs");
-const { jwtSign } = require("../../middlewares/auth.middleware");
-const { generateOTP } = require("../../services/otp.service");
-const { sendSMS } = require("../../services/message.service");
+const { jwtSign } = require("../middlewares/auth.middleware");
+const { generateOTP } = require("../services/otp.service");
+const { sendSMS } = require("../services/message.service");
 
 // EPI
 exports.endpoint = (req, res) => {
@@ -149,7 +149,7 @@ exports.forgotPassword = async (req, res) => {
 
 exports.resendOTP = async (req, res) => {
   const otp = generateOTP();
-  const info = await sendSMS({
+  await sendSMS({
     to: req.body.phone,
     message: `Enter this code ${otp} to recover your account .Thank you.`,
   });
