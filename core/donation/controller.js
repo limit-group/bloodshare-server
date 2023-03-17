@@ -1,5 +1,5 @@
 const prisma = require("../../utils/db.utils");
-const { v4 } = require("uuidv4");
+const { v4 } = require("uuidv4");;
 
 exports.allDonations = async (req, res) => {
   try {
@@ -113,6 +113,18 @@ exports.getRecords = async (req, res) => {
         facilityId: facility.id,
       },
     });
+    res.status(200).send(records);
+  } catch (err) {
+    res.status(500).send({
+      message: "failed to fetch records",
+    });
+  }
+};
+
+exports.getAllRecords = async (req, res) => {
+  try {
+    const records = await prisma.record.findMany({});
+    console.log(records);
     res.status(200).send(records);
   } catch (err) {
     res.status(500).send({
