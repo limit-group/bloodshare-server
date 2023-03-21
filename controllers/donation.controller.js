@@ -17,12 +17,17 @@ exports.allDonations = async (req, res) => {
 // my donations
 exports.myDonations = async (req, res) => {
   try {
+    const profile = await prisma.profile.findFirst({
+      where: {
+        userId: req.user.id,
+      },
+    });
     const my_donations = await prisma.donation.findMany({
       orderBy: {
         id: "desc",
       },
       where: {
-        profileId: req.user.id,
+        profileId: profile.id,
       },
     });
     res.status(200).send(my_donations);

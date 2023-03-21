@@ -95,7 +95,6 @@ exports.createRequest = async (req, res) => {
     let patientName = profile.name;
     return patientName;
   }
-  console.log(patientName);
   try {
     // query users to send the request alerts
     const profiles = await prisma.profile.findMany({
