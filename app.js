@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 var cors = require("cors");
-const port = process.env.PORT | 5000;
+const port = process.env.PORT || 5000;
 
 const app = express();
 const bodyParser = require("body-parser");
@@ -14,7 +14,7 @@ app.use(
     extended: true,
   })
 );
-// Function to serve all static files
+// to serve all static files
 // inside public directory.
 app.use(express.static("public"));
 app.use("/images", express.static("images"));
